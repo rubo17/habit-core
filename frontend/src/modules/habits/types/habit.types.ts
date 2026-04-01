@@ -2,7 +2,7 @@ export interface Habit {
   id: string
   name: string
   description?: string
-  icon: string // references HabitIconDef.name
+  icon: string 
   createdAt: string
   updatedAt: string
   isActive: boolean

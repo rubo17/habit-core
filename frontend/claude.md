@@ -11,11 +11,11 @@ src/
  │   ├── components/
  │   ├── composables/
  │   └── utils/
- │
+ │   └── types/
+ │   └── plugins/
  ├── router/
  │
  ├──constanst/
- ├──plugins/
  └── main.ts
 
 Each module is self-contained and follows this structure:
