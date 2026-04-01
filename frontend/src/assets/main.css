@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surfaces */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f1f5f9;
+
+  /* Text */
+  --color-foreground: #0f172a;
+  --color-muted: #64748b;
+  --color-muted-foreground: #94a3b8;
+
+  /* Accent (indigo) */
+  --color-accent: #6366f1;
+  --color-accent-hover: #4f46e5;
+  --color-accent-foreground: #ffffff;
+  --color-accent-subtle: #eef2ff;
+
+  /* Borders & ring */
+  --color-border: #e2e8f0;
+  --color-ring: #6366f1;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-success-subtle: #dcfce7;
+  --color-warning: #f59e0b;
+  --color-warning-subtle: #fef9c3;
+  --color-danger: #ef4444;
+  --color-danger-subtle: #fee2e2;
+}
+
+.dark {
+  /* Surfaces */
+  --color-background: #0c0c10;
+  --color-surface: #13131a;
+  --color-surface-raised: #1c1c26;
+
+  /* Text */
+  --color-foreground: #f1f5f9;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #64748b;
+
+  /* Accent */
+  --color-accent: #818cf8;
+  --color-accent-hover: #6366f1;
+  --color-accent-foreground: #ffffff;
+  --color-accent-subtle: #1e1b4b;
+
+  /* Borders & ring */
+  --color-border: #1e293b;
+  --color-ring: #818cf8;
+
+  /* Semantic */
+  --color-success: #4ade80;
+  --color-success-subtle: #052e16;
+  --color-warning: #fbbf24;
+  --color-warning-subtle: #1c1400;
+  --color-danger: #f87171;
+  --color-danger-subtle: #2d0a0a;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
