@@ -33,6 +33,7 @@ Each module is self-contained and follows this structure:
 - Do NOT overengineer
 - Follow existing patterns strictly
 - Do NOT create new architecture unless explicitly requested
+- SVGs in icon components please
 
 ---
 
