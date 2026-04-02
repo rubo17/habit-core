@@ -33,10 +33,13 @@
 
       <button
         type="submit"
-        class="w-full bg-accent hover:bg-accent-hover text-accent-foreground font-semibold tracking-widest rounded-full py-4 transition-colors mt-2"
+        class="w-full bg-accent hover:bg-accent-hover text-accent-foreground font-semibold tracking-widest rounded-full py-4 transition-colors mt-2 disabled:opacity-50"
+        :disabled="loading"
       >
-        LOGIN
+        {{ loading ? '...' : 'LOGIN' }}
       </button>
+
+      <p v-if="error" class="text-sm text-danger text-center">{{ error }}</p>
 
       <div class="text-center">
         <a href="#" class="text-sm text-accent hover:underline">Olvidaste la contraseña?</a>
@@ -64,7 +67,10 @@
 import { reactive } from 'vue'
 import { RouterLink } from 'vue-router'
 import AuthInput from '../components/AuthInput.vue'
-import GoogleButton from '../components/GoogleButton.vue';
+import GoogleButton from '../components/GoogleButton.vue'
+import { useAuth } from '../composables/useAuth'
+
+const { login, loading, error } = useAuth()
 
 const form = reactive({
   email: '',
@@ -72,6 +78,6 @@ const form = reactive({
 })
 
 function handleLogin() {
-  // TODO: implement login
+  login({ email: form.email, password: form.password })
 }
 </script>

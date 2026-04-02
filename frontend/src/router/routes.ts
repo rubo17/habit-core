@@ -28,6 +28,10 @@ export const routes = [
         component: () => import('@/modules/auth/views/RegisterView.vue')
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('@/views/NotFoundView.vue')
   }
-  
 ]

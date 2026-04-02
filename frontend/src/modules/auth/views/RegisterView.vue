@@ -47,10 +47,13 @@
 
       <button
         type="submit"
-        class="w-full bg-accent hover:bg-accent-hover text-accent-foreground font-semibold tracking-widest rounded-full py-4 transition-colors mt-2"
+        class="w-full bg-accent hover:bg-accent-hover text-accent-foreground font-semibold tracking-widest rounded-full py-4 transition-colors mt-2 disabled:opacity-50"
+        :disabled="loading"
       >
-        REGISTRATE
+        {{ loading ? '...' : 'REGISTRATE' }}
       </button>
+
+      <p v-if="error" class="text-sm text-danger text-center">{{ error }}</p>
     </form>
 
     <!-- Google -->
@@ -76,7 +79,10 @@
 import { reactive } from 'vue'
 import { RouterLink } from 'vue-router'
 import AuthInput from '../components/AuthInput.vue'
-import GoogleButton from '../components/GoogleButton.vue';
+import GoogleButton from '../components/GoogleButton.vue'
+import { useAuth } from '../composables/useAuth'
+
+const { register, loading, error } = useAuth()
 
 const form = reactive({
   name: '',
@@ -86,6 +92,11 @@ const form = reactive({
 })
 
 function handleRegister() {
-  // TODO: implement register
+  register({
+    name: form.name,
+    email: form.email,
+    password: form.password,
+    password_confirmation: form.confirmPassword
+  })
 }
 </script>
