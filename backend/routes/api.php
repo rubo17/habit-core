@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\HabitController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -11,6 +11,8 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('user', fn(Request $request) => $request->user());
+        Route::get('habits', [HabitController::class, 'index']);
+        Route::post('habits', [HabitController::class, 'store']);
+        Route::delete('habits/{habit}', [HabitController::class, 'destroy']);
     });
 });
