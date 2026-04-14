@@ -26,3 +26,17 @@ export interface CreateHabitDto {
   color?: string | null
   icon?: string | null
 }
+
+export interface HabitResponse {
+  data: Habit
+}
+
+export interface HabitListResponse {
+  data: {
+    data: Habit[]
+  }
+}
+
+export type SyncOperation =
+  | { type: 'create'; payload: CreateHabitDto; tempId: number }
+  | { type: 'delete'; id: number }

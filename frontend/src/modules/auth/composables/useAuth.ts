@@ -38,5 +38,10 @@ export function useAuth() {
     }
   }
 
-  return { login, register, loading, error }
+  async function logout() {
+      localStorage.removeItem('token')
+      router.push({ name: 'login' })
+  }
+
+  return { login, register, logout, loading, error }
 }

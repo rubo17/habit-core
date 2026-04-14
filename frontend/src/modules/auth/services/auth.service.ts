@@ -8,5 +8,6 @@ export const authService = {
 
   register(credentials: RegisterCredentials): Promise<AuthResponse> {
     return http.post<AuthResponse>('/auth/register', credentials)
-  }
+  },
+
 }

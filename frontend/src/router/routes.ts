@@ -10,6 +10,11 @@ export const routes = [
         path: 'habits',
         name: 'habits',
         component: () => import('@/modules/habits/views/HabitView.vue')
+      },
+      {
+        path: 'settings',
+        name: 'settings',
+        component: () => import('@/modules/settings/views/SettingsView.vue')
       }
     ]
   },
