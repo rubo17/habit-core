@@ -4,7 +4,7 @@ export interface HabitIconDef {
   name: string
   label: string
   category: HabitIconCategory
-  svg: string // inner SVG HTML — supports path, circle, line, polyline, polygon
+  svg: string 
 }
 
 export const habitIcons: HabitIconDef[] = [
