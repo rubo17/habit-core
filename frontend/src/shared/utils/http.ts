@@ -13,10 +13,11 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     body: body ? JSON.stringify(body) : undefined
   })
 
-  const data = await response.json()
+  const text = await response.text()
+  const data = text ? JSON.parse(text) : null
 
   if (!response.ok) {
-    throw new Error(data.message ?? 'Request failed')
+    throw new Error(data?.message ?? 'Request failed')
   }
 
   return data
