@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HabitController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -11,6 +12,10 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('user', [UserController::class, 'show']);
+        Route::patch('user', [UserController::class, 'update']);
+        Route::patch('user/password', [UserController::class, 'updatePassword']);
+
         Route::get('habits', [HabitController::class, 'index']);
         Route::post('habits', [HabitController::class, 'store']);
         Route::delete('habits/{habit}', [HabitController::class, 'destroy']);
