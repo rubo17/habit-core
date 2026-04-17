@@ -4,7 +4,7 @@ import { authService } from '../services/auth.service'
 import { clearCache } from '@/shared/composables/useLocalStorage'
 import type { LoginCredentials, RegisterCredentials } from '../types/auth.types'
 
-const USER_KEYS = ['token', 'user', 'habits', 'habits:completed', 'habits:sync-queue']
+const USER_KEYS = ['token', 'user', 'habits', 'habits:sync-queue']
 
 export function useAuth() {
   const router = useRouter()

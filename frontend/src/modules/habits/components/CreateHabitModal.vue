@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import BaseModal from '@/shared/components/BaseModal.vue'
 import HabitIcon from '@/shared/components/icons/HabitIcon.vue'
 import HabitIconPicker from './HabitIconPicker.vue'
@@ -16,21 +16,51 @@ const COLORS = [
   '#ef4444', '#8b5cf6', '#ec4899', '#f59e0b',
 ]
 
+const DAYS = [
+  { label: 'L', value: 1 },
+  { label: 'M', value: 2 },
+  { label: 'X', value: 3 },
+  { label: 'J', value: 4 },
+  { label: 'V', value: 5 },
+  { label: 'S', value: 6 },
+  { label: 'D', value: 0 },
+]
+
+const ALL_DAYS = DAYS.map(d => d.value)
+
 const DEFAULT: CreateHabitDto = {
   name: '',
   frequency: 'daily',
   category_id: null,
   reminder_time: null,
+  reminder_days: null,
   color: '#6366f1',
   icon: 'sparkles',
 }
 
 const form = reactive<CreateHabitDto>({ ...DEFAULT })
 const showIconPicker = ref(false)
+const selectedDays = ref<number[]>([...ALL_DAYS])
+
+watch(() => form.reminder_time, (val) => {
+  if (!val) {
+    selectedDays.value = [...ALL_DAYS]
+    form.reminder_days = null
+  }
+})
+
+function toggleDay(day: number) {
+  if (selectedDays.value.includes(day)) {
+    selectedDays.value = selectedDays.value.filter(d => d !== day)
+  } else {
+    selectedDays.value = [...selectedDays.value, day]
+  }
+}
 
 function resetForm() {
   Object.assign(form, DEFAULT)
   showIconPicker.value = false
+  selectedDays.value = [...ALL_DAYS]
 }
 
 function close() {
@@ -40,7 +70,13 @@ function close() {
 
 async function submit() {
   if (!form.name.trim()) return
-  await createHabit({ ...form })
+
+  const days = selectedDays.value
+  const reminderDays = form.reminder_time && days.length < 7 && days.length > 0
+    ? days
+    : null
+
+  await createHabit({ ...form, reminder_days: reminderDays })
   close()
 }
 </script>
@@ -101,13 +137,33 @@ async function submit() {
       </div>
 
       <!-- Recordatorio -->
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-3">
         <p class="text-xs font-medium text-muted-foreground">Recordatorio <span class="font-normal">(opcional)</span></p>
         <input
           v-model="form.reminder_time"
           type="time"
           class="w-full bg-surface-raised border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow duration-150"
         />
+
+        <div v-if="form.reminder_time" class="flex flex-col gap-2">
+          <p class="text-xs text-muted-foreground">Días</p>
+          <div class="flex gap-2">
+            <button
+              v-for="day in DAYS"
+              :key="day.value"
+              type="button"
+              @click="toggleDay(day.value)"
+              :class="[
+                'w-9 h-9 rounded-full text-xs font-medium transition-colors duration-150',
+                selectedDays.includes(day.value)
+                  ? 'bg-accent text-accent-foreground'
+                  : 'bg-surface-raised text-muted-foreground',
+              ]"
+            >
+              {{ day.label }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Acción -->

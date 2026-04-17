@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import HabitCard from '../components/HabitCard.vue'
 import HabitCategoryCard from '../components/HabitCategoryCard.vue'
 import AddHabitIcon from '../components/icons/AddHabitIcon.vue'
@@ -9,7 +9,9 @@ import { useModal } from '@/shared/composables/useModal'
 import type { HabitCategory } from '../types/habit.types'
 import EmptyHabits from '../components/EmptyHabits.vue'
 
-const { habits, completed, toggleHabit, deleteHabit } = useHabits()
+const { habits, completed, fetchHabits, toggleHabit, deleteHabit } = useHabits()
+
+onMounted(fetchHabits)
 const createModal = useModal()
 
 const ALL: HabitCategory = { id: 0, name: 'Todos' }

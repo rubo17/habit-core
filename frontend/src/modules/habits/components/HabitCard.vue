@@ -2,75 +2,88 @@
 import { computed } from 'vue'
 import HabitIcon from '@/shared/components/icons/HabitIcon.vue'
 import { useSwipe } from '@/shared/composables/useSwipe'
+import { useHabitCard } from '../composables/useHabitCard'
 import type { Habit } from '../types/habit.types'
-import DeleteHabitIcon from './icons/DeleteHabitIcon.vue';
+import DeleteHabitIcon from './icons/DeleteHabitIcon.vue'
+import ChevronIcon from './icons/ChevronIcon.vue'
+import ExpandedCard from './ExpandedCard.vue'
 
 const props = defineProps<{ habit: Habit; completed: boolean }>()
-const emit = defineEmits<{ toggle: []; delete: [] }>()
+const emit = defineEmits<{ toggle: []; delete: []; edit: [] }>()
 
 const DEFAULT_COLOR = '#6366f1'
 const habitColor = computed(() => props.habit.color ?? DEFAULT_COLOR)
 const habitIcon = computed(() => props.habit.icon ?? 'sparkles')
 
 const { elementRef, offsetX, isAnimating, progress, onTouchStart, onTouchEnd } = useSwipe(() => emit('delete'))
+const { isExpanded, toggleExpand } = useHabitCard()
 </script>
 
 <template>
-  <div class="relative overflow-hidden rounded-2xl">
-    <div v-show="offsetX < 0" class="absolute inset-0 bg-danger flex items-center justify-end pr-5">
-      <DeleteHabitIcon 
-        class="text-white h-8 w-8" 
-        :style="{ opacity: progress, transform: `scale(${0.6 + progress * 0.4})` }"
-      />
-    </div>
-    
-    <div
-      ref="elementRef"
-      :style="{ transform: `translateX(${offsetX}px)` }"
-      :class="['relative flex items-center gap-3 p-4 bg-surface', { 'transition-transform duration-200': isAnimating }]"
-      @touchstart="onTouchStart"
-      @touchend="onTouchEnd"
-    >
-      <div
-        v-if="completed"
-        class="absolute inset-0 pointer-events-none"
-        :style="{ backgroundColor: `${habitColor}20` }"
-      />
+  <div class="rounded-2xl overflow-hidden">
 
-      <div
-        :style="{ backgroundColor: habitColor }"
-        class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-white"
-      >
-        <HabitIcon :name="habitIcon" :size="20" />
+    <!-- Fila principal con swipe -->
+    <div class="relative overflow-hidden">
+      <div v-show="offsetX < 0" class="absolute inset-0 bg-danger flex items-center justify-end pr-5">
+        <DeleteHabitIcon
+          class="text-white h-8 w-8"
+          :style="{ opacity: progress, transform: `scale(${0.6 + progress * 0.4})` }"
+        />
       </div>
 
-      <div class="flex-1 min-w-0">
-        <p class="text-foreground font-medium truncate">{{ habit.name }}</p>
-        <p v-if="habit.category || habit.reminder_time" class="text-muted-foreground text-sm flex items-center gap-1">
-          <span v-if="habit.category">{{ habit.category.name }}</span>
-          <span v-if="habit.category && habit.reminder_time">·</span>
-          <span v-if="habit.reminder_time">{{ habit.reminder_time }}</span>
-        </p>
+      <div
+        ref="elementRef"
+        :style="{ transform: `translateX(${offsetX}px)` }"
+        :class="['relative flex items-center gap-3 p-4 bg-surface cursor-pointer', { 'transition-transform duration-200': isAnimating }]"
+        @click="toggleExpand"
+        @touchstart="onTouchStart"
+        @touchend="onTouchEnd"
+      >
+        <div
+          v-if="completed"
+          class="absolute inset-0 pointer-events-none"
+          :style="{ backgroundColor: `${habitColor}20` }"
+        />
+
+        <div
+          :style="{ backgroundColor: habitColor }"
+          class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-white"
+        >
+          <HabitIcon :name="habitIcon" :size="20" />
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <p class="text-foreground font-medium truncate">{{ habit.name }}</p>
+          <p v-if="habit.category || habit.reminder_time" class="text-muted-foreground text-sm flex items-center gap-1">
+            <span v-if="habit.category">{{ habit.category.name }}</span>
+            <span v-if="habit.category && habit.reminder_time">·</span>
+            <span v-if="habit.reminder_time">{{ habit.reminder_time }}</span>
+          </p>
+        </div>
+
+        <button
+          @click.stop="emit('delete')"
+          class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-danger hover:bg-surface-raised transition-colors duration-150"
+        >
+          <DeleteHabitIcon />
+        </button>
+
+        <button
+          @click.stop="emit('toggle')"
+          :class="[
+            'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150',
+            completed ? 'bg-success' : 'border-2 border-border',
+          ]"
+        >
+          <svg v-if="completed" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </button>
       </div>
-
-      <button
-        @click="emit('delete')"
-        class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-danger hover:bg-surface-raised transition-colors duration-150"
-      >
-        <DeleteHabitIcon/>
-      </button>
-
-      <button
-        @click.stop="emit('toggle')"
-        :class="[
-          'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150',
-          completed ? 'bg-success' : 'border-2 border-border',
-        ]"
-      >
-        <svg v-if="completed" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-      </button>
     </div>
+
+    <!-- Sección expandible -->
+    <ExpandedCard :is-expanded="isExpanded" :habit="habit" @edit="emit('edit')" />
+
   </div>
 </template>
