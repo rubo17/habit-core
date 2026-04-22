@@ -1,0 +1,131 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = defineProps<{
+  color: string
+  habitId: number
+  loggedDates?: string[]
+}>()
+
+const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const DAY_LABELS = ['', 'L', '', 'X', '', 'V', '']
+
+function mockLevel(habitId: number, dateStr: string): number {
+  const n = Math.abs(Math.sin(habitId * 9301 + parseInt(dateStr.replace(/-/g, '')) * 49297))
+  if (n > 0.80) return 4
+  if (n > 0.70) return 3
+  if (n > 0.60) return 2
+  if (n > 0.50) return 1
+  return 0
+}
+
+type Cell = { date: string | null; level: number; month: number }
+
+const weeks = computed<Cell[][]>(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const loggedSet = props.loggedDates ? new Set(props.loggedDates) : null
+
+  const start = new Date(today)
+  start.setDate(start.getDate() - 364)
+  start.setDate(start.getDate() - start.getDay())
+
+  const result: Cell[][] = []
+  const cursor = new Date(start)
+
+  while (result.length < 53) {
+    const week: Cell[] = []
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(cursor)
+      const isFuture = date > today
+      const dateStr = date.toISOString().split('T')[0]
+
+      if (isFuture) {
+        week.push({ date: null, level: 0, month: date.getMonth() })
+      } else {
+        const level = loggedSet
+          ? (loggedSet.has(dateStr) ? 4 : 0)
+          : mockLevel(props.habitId, dateStr)
+        week.push({ date: dateStr, level, month: date.getMonth() })
+      }
+      cursor.setDate(cursor.getDate() + 1)
+    }
+    result.push(week)
+  }
+
+  return result
+})
+
+const monthLabels = computed(() => {
+  const labels: { label: string; col: number }[] = []
+  let lastMonth = -1
+
+  weeks.value.forEach((week, col) => {
+    const first = week.find(d => d.date)
+    if (!first) return
+    const month = new Date(first.date!).getMonth()
+    if (month !== lastMonth) {
+      labels.push({ label: MONTHS[month], col })
+      lastMonth = month
+    }
+  })
+
+  return labels
+})
+
+function cellColor(level: number): string {
+  if (level === 0) return 'var(--color-surface-raised)'
+  const opacities = [0, 0.25, 0.45, 0.70, 1]
+  const hex = props.color
+  return level === 4
+    ? hex
+    : `${hex}${Math.round(opacities[level] * 255).toString(16).padStart(2, '0')}`
+}
+</script>
+
+<template>
+  <div class="overflow-x-auto scrollbar-hidden">
+    <div class="flex gap-[3px] min-w-max">
+
+      <!-- Etiquetas de días -->
+      <div class="flex flex-col gap-[3px] mr-1 flex-shrink-0">
+        <div class="h-4" />
+        <div
+          v-for="(label, i) in DAY_LABELS"
+          :key="i"
+          class="w-4 h-[11px] flex items-center justify-end text-[9px] text-muted-foreground leading-none"
+        >
+          {{ label }}
+        </div>
+      </div>
+
+      <!-- Columnas de semanas -->
+      <div
+        v-for="(week, wi) in weeks"
+        :key="wi"
+        class="flex flex-col gap-[3px] flex-shrink-0"
+      >
+        <!-- Etiqueta de mes -->
+        <div class="h-4 flex items-center">
+          <span
+            v-if="monthLabels.find(m => m.col === wi)"
+            class="text-[9px] text-muted-foreground leading-none whitespace-nowrap"
+          >
+            {{ monthLabels.find(m => m.col === wi)?.label }}
+          </span>
+        </div>
+
+        <!-- Celdas del día -->
+        <div
+          v-for="(cell, di) in week"
+          :key="di"
+          :title="cell.date ?? ''"
+          class="w-[11px] h-[11px] rounded-[2px] transition-opacity duration-150 hover:opacity-80"
+          :style="{ backgroundColor: cellColor(cell.level) }"
+        />
+      </div>
+
+    </div>
+  </div>
+</template>

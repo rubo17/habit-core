@@ -1,6 +1,7 @@
 export interface HabitCategory {
   id: number
   name: string
+  icon?: string | null
 }
 
 export interface Habit {
@@ -11,8 +12,10 @@ export interface Habit {
   name: string
   frequency: 'daily'
   reminder_time: string | null
+  reminder_days: number[] | null
   color: string | null
   icon: string | null
+  today_logged: boolean
   deleted_at: string | null
   created_at: string
   updated_at: string
@@ -23,6 +26,7 @@ export interface CreateHabitDto {
   name: string
   frequency: 'daily'
   reminder_time?: string | null
+  reminder_days?: number[] | null
   color?: string | null
   icon?: string | null
 }
@@ -37,6 +41,21 @@ export interface HabitListResponse {
   }
 }
 
+export interface CreateCategoryDto {
+  name: string
+  icon?: string | null
+}
+
+export interface CategoryResponse {
+  data: HabitCategory
+}
+
+export interface CategoryListResponse {
+  data: HabitCategory[]
+}
+
 export type SyncOperation =
   | { type: 'create'; payload: CreateHabitDto; tempId: number }
   | { type: 'delete'; id: number }
+  | { type: 'log'; id: number }
+  | { type: 'unlog'; id: number; date: string }

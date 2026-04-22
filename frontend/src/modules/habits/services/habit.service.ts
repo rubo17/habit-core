@@ -14,4 +14,12 @@ export const habitService = {
   remove(id: number): Promise<void> {
     return http.delete<void>(`/habits/${id}`)
   },
+
+  log(id: number): Promise<void> {
+    return http.post<void>(`/habits/${id}/logs`, {})
+  },
+
+  unlog(id: number, date: string): Promise<void> {
+    return http.delete<void>(`/habits/${id}/logs/${date}`)
+  },
 }

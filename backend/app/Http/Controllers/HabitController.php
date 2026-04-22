@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\Habit\CreateHabitAction;
 use App\Actions\Habit\DeleteHabitAction;
+use App\Actions\Habit\LogHabitAction;
+use App\Actions\Habit\UnlogHabitAction;
 use App\Http\Requests\Habit\StoreHabitRequest;
 use App\Models\Habit;
 use Illuminate\Http\JsonResponse;
@@ -13,10 +15,18 @@ class HabitController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $today = today()->toDateString();
+
         $habits = $request->user()
             ->habits()
-            ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
+            ->with(['category', 'logs' => fn ($q) => $q->whereDate('logged_date', $today)])
+            ->when($request->category_id, fn ($q) => $q->where('category_id', $request->category_id))
             ->paginate($request->integer('per_page', 15));
+
+        $habits->through(function ($habit) {
+            $habit->today_logged = $habit->logs->isNotEmpty();
+            return $habit;
+        });
 
         return response()->json(['data' => $habits]);
     }
@@ -33,6 +43,24 @@ class HabitController extends Controller
         $this->authorize('delete', $habit);
 
         $action->execute($habit);
+
+        return response()->json(null, 204);
+    }
+
+    public function log(Request $request, Habit $habit, LogHabitAction $action): JsonResponse
+    {
+        abort_if($request->user()->id !== $habit->user_id, 403);
+
+        $action->execute($habit);
+
+        return response()->json(null, 204);
+    }
+
+    public function unlog(Request $request, Habit $habit, UnlogHabitAction $action): JsonResponse
+    {
+        abort_if($request->user()->id !== $habit->user_id, 403);
+
+        $action->execute($habit, $request->route('date'));
 
         return response()->json(null, 204);
     }

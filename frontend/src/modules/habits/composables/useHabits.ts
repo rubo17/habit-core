@@ -5,16 +5,43 @@ import type { CreateHabitDto, Habit, SyncOperation } from '../types/habit.types'
 
 export function useHabits() {
   const habits = useLocalStorage<Habit[]>('habits', [])
-  const completedIds = useLocalStorage<number[]>('habits:completed', [])
   const syncQueue = useLocalStorage<SyncOperation[]>('habits:sync-queue', [])
 
-  const completed = computed(() => new Set(completedIds.value))
+  const completed = computed(() => new Set(
+    habits.value.filter(h => h.today_logged).map(h => h.id)
+  ))
+
+  async function fetchHabits() {
+    try {
+      const response = await habitService.getAll()
+      habits.value = response.data.data
+    } catch {
+      // keep localStorage as fallback
+    }
+  }
 
   function toggleHabit(id: number) {
-    if (completed.value.has(id)) {
-      completedIds.value = completedIds.value.filter(c => c !== id)
+    const isCompleted = completed.value.has(id)
+    const today = new Date().toISOString().split('T')[0]
+
+    habits.value = habits.value.map(h =>
+      h.id === id ? { ...h, today_logged: !isCompleted } : h
+    )
+
+    if (isCompleted) {
+      habitService.unlog(id, today).catch(() => {
+        habits.value = habits.value.map(h =>
+          h.id === id ? { ...h, today_logged: true } : h
+        )
+        syncQueue.value = [...syncQueue.value, { type: 'unlog', id, date: today }]
+      })
     } else {
-      completedIds.value = [...completedIds.value, id]
+      habitService.log(id).catch(() => {
+        habits.value = habits.value.map(h =>
+          h.id === id ? { ...h, today_logged: false } : h
+        )
+        syncQueue.value = [...syncQueue.value, { type: 'log', id }]
+      })
     }
   }
 
@@ -26,8 +53,10 @@ export function useHabits() {
       user_id: 0,
       category_id: data.category_id ?? null,
       reminder_time: data.reminder_time ?? null,
+      reminder_days: data.reminder_days ?? null,
       color: data.color ?? null,
       icon: data.icon ?? null,
+      today_logged: false,
       deleted_at: null,
       created_at: '',
       updated_at: '',
@@ -68,6 +97,12 @@ export function useHabits() {
         if (op.type === 'delete') {
           await habitService.remove(op.id)
         }
+        if (op.type === 'log') {
+          await habitService.log(op.id)
+        }
+        if (op.type === 'unlog') {
+          await habitService.unlog(op.id, op.date)
+        }
       } catch {
         syncQueue.value = [...syncQueue.value, op]
       }
@@ -76,5 +111,5 @@ export function useHabits() {
 
   window.addEventListener('online', flushQueue)
 
-  return { habits, completed, toggleHabit, createHabit, deleteHabit }
+  return { habits, completed, fetchHabits, toggleHabit, createHabit, deleteHabit }
 }

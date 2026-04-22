@@ -29,6 +29,11 @@ class User extends Authenticatable
         return $this->hasMany(Habit::class);
     }
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
     protected function casts(): array
     {
         return [

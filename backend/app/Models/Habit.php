@@ -17,8 +17,13 @@ class Habit extends Model
         'name',
         'frequency',
         'reminder_time',
+        'reminder_days',
         'color',
         'icon',
+    ];
+
+    protected $casts = [
+        'reminder_days' => 'array',
     ];
 
     public function user(): BelongsTo

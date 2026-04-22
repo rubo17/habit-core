@@ -2,6 +2,10 @@ import { ref, watch, type Ref } from 'vue'
 
 const cache = new Map<string, Ref>()
 
+export function clearCache(keys: string[]) {
+  keys.forEach(key => cache.delete(key))
+}
+
 export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
   if (cache.has(key)) {
     return cache.get(key) as Ref<T>
