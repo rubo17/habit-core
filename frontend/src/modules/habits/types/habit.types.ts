@@ -1,6 +1,7 @@
 export interface HabitCategory {
   id: number
   name: string
+  icon?: string | null
 }
 
 export interface Habit {
@@ -38,6 +39,19 @@ export interface HabitListResponse {
   data: {
     data: Habit[]
   }
+}
+
+export interface CreateCategoryDto {
+  name: string
+  icon?: string | null
+}
+
+export interface CategoryResponse {
+  data: HabitCategory
+}
+
+export interface CategoryListResponse {
+  data: HabitCategory[]
 }
 
 export type SyncOperation =

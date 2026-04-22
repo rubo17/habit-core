@@ -5,7 +5,6 @@ import { useSwipe } from '@/shared/composables/useSwipe'
 import { useHabitCard } from '../composables/useHabitCard'
 import type { Habit } from '../types/habit.types'
 import DeleteHabitIcon from './icons/DeleteHabitIcon.vue'
-import ChevronIcon from './icons/ChevronIcon.vue'
 import ExpandedCard from './ExpandedCard.vue'
 
 const props = defineProps<{ habit: Habit; completed: boolean }>()

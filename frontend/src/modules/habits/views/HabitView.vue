@@ -5,29 +5,24 @@ import HabitCategoryCard from '../components/HabitCategoryCard.vue'
 import AddHabitIcon from '../components/icons/AddHabitIcon.vue'
 import CreateHabitModal from '../components/CreateHabitModal.vue'
 import { useHabits } from '../composables/useHabits'
+import { useCategories } from '../composables/useCategories'
 import { useModal } from '@/shared/composables/useModal'
 import type { HabitCategory } from '../types/habit.types'
 import EmptyHabits from '../components/EmptyHabits.vue'
 
 const { habits, completed, fetchHabits, toggleHabit, deleteHabit } = useHabits()
+const { categories, fetchCategories, deleteCategory } = useCategories()
 
-onMounted(fetchHabits)
+onMounted(() => { fetchHabits(); fetchCategories() })
 const createModal = useModal()
 
 const ALL: HabitCategory = { id: 0, name: 'Todos' }
 const selectedCategory = ref<HabitCategory>(ALL)
 
-const categories = computed<HabitCategory[]>(() => {
-  const seen = new Set<number>()
-  const result: HabitCategory[] = []
-  for (const habit of habits.value) {
-    if (habit.category && !seen.has(habit.category.id)) {
-      seen.add(habit.category.id)
-      result.push(habit.category)
-    }
-  }
-  return result
-})
+async function removeCategory(category: HabitCategory) {
+  if (selectedCategory.value.id === category.id) selectedCategory.value = ALL
+  await deleteCategory(category.id)
+}
 
 const filteredHabits = computed(() =>
   selectedCategory.value.id === 0
@@ -39,7 +34,7 @@ const filteredHabits = computed(() =>
 <template>
   <section class="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-4">
     <div v-if="filteredHabits.length">
-      <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hidden">
             <HabitCategoryCard
               :category="ALL"
               :active="selectedCategory.id === 0"
@@ -51,6 +46,7 @@ const filteredHabits = computed(() =>
               :category="category"
               :active="selectedCategory.id === category.id"
               @select="selectedCategory = category"
+              @remove="removeCategory(category)"
             />
           </div>
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -21,5 +22,10 @@ Route::prefix('v1')->group(function () {
         Route::delete('habits/{habit}', [HabitController::class, 'destroy']);
         Route::post('habits/{habit}/logs', [HabitController::class, 'log']);
         Route::delete('habits/{habit}/logs/{date}', [HabitController::class, 'unlog']);
+
+        Route::get('categories', [CategoryController::class, 'index']);
+        Route::post('categories', [CategoryController::class, 'store']);
+        Route::put('categories/{category}', [CategoryController::class, 'update']);
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
     });
 });

@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import BaseModal from '@/shared/components/BaseModal.vue'
 import HabitIcon from '@/shared/components/icons/HabitIcon.vue'
 import HabitIconPicker from './HabitIconPicker.vue'
+import CreateCategoryModal from './CreateCategoryModal.vue'
 import { useHabits } from '../composables/useHabits'
-import type { CreateHabitDto } from '../types/habit.types'
+import { useCategories } from '../composables/useCategories'
+import { useModal } from '@/shared/composables/useModal'
+import type { CreateHabitDto, HabitCategory } from '../types/habit.types'
+import DefaultCategoryIcon from './icons/DefaultCategoryIcon.vue'
 
 defineProps<{ isOpen: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 
 const { createHabit } = useHabits()
+const { categories, fetchCategories } = useCategories()
+const categoryModal = useModal()
+
+onMounted(fetchCategories)
 
 const COLORS = [
   '#6366f1', '#3b82f6', '#22c55e', '#f97316',
@@ -57,6 +65,10 @@ function toggleDay(day: number) {
   }
 }
 
+function onCategoryCreated(category: HabitCategory) {
+  form.category_id = category.id
+}
+
 function resetForm() {
   Object.assign(form, DEFAULT)
   showIconPicker.value = false
@@ -92,9 +104,10 @@ async function submit() {
           @click="showIconPicker = !showIconPicker"
           :style="{ backgroundColor: form.color ?? '#6366f1' }"
           class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white transition-transform duration-150 active:scale-95"
-        >
-          <HabitIcon :name="form.icon ?? 'sparkles'" :size="22" />
-        </button>
+        > 
+          <HabitIcon v-if="form.icon" :name="form.icon" :size="22" />
+          <DefaultCategoryIcon v-else :size="22" />
+      </button>
 
         <input
           v-model="form.name"
@@ -114,6 +127,25 @@ async function submit() {
             @update:model-value="(val) => { form.icon = val; showIconPicker = false }"
           />
         </div>
+      </div>
+
+      <!-- Categoría -->
+      <div class="flex flex-col gap-2">
+        <p class="text-xs font-medium text-muted-foreground">Categoría</p>
+        <select
+          v-model="form.category_id"
+          class="w-full bg-surface-raised border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow duration-150"
+        >
+          <option :value="null">Ninguna</option>
+          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+        </select>
+        <button
+          type="button"
+          @click="categoryModal.open()"
+          class="self-start text-xs text-accent font-medium hover:underline"
+        >
+          + Nueva categoría
+        </button>
       </div>
 
       <!-- Colores -->
@@ -178,4 +210,10 @@ async function submit() {
 
     </div>
   </BaseModal>
+
+  <CreateCategoryModal
+    :is-open="categoryModal.isOpen.value"
+    @close="categoryModal.close()"
+    @created="onCategoryCreated"
+  />
 </template>
