@@ -22,9 +22,18 @@ export interface Habit {
 }
 
 export interface CreateHabitDto {
-  category_id?: number | null
+  category_id: number | null
   name: string
   frequency: 'daily'
+  reminder_time?: string | null
+  reminder_days?: number[] | null
+  color?: string | null
+  icon?: string | null
+}
+
+export interface UpdateHabitDto {
+  category_id?: number | null
+  name?: string
   reminder_time?: string | null
   reminder_days?: number[] | null
   color?: string | null

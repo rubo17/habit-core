@@ -3,8 +3,9 @@ import HabitIcon from '@/shared/components/icons/HabitIcon.vue';
 import type { HabitCategory } from '../types/habit.types'
 import DefaultCategoryIcon from './icons/DefaultCategoryIcon.vue';
 import CloseIcon from '@/shared/components/icons/CloseIcon.vue';
+import { onMounted } from 'vue';
 
-defineProps<{ category: HabitCategory; active: boolean }>()
+const props = defineProps<{ category: HabitCategory; active: boolean }>()
 defineEmits<{ select: []; remove: [] }>()
 
 </script>
@@ -27,7 +28,7 @@ defineEmits<{ select: []; remove: [] }>()
     </button>
     
     <!-- Botón de cerrar -->
-    <button
+    <button v-if="category.id !== 0"
       @click.stop="$emit('remove')"
       class="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-full transition-all duration-150 md:opacity-0 group-hover:opacity-100"
       :class="[

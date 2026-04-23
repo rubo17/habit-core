@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { useLocalStorage } from '@/shared/composables/useLocalStorage'
 import { habitService } from '../services/habit.service'
-import type { CreateHabitDto, Habit, SyncOperation } from '../types/habit.types'
+import type { CreateHabitDto, Habit, SyncOperation, UpdateHabitDto } from '../types/habit.types'
 
 export function useHabits() {
   const habits = useLocalStorage<Habit[]>('habits', [])
@@ -72,6 +72,17 @@ export function useHabits() {
     }
   }
 
+  async function updateHabit(id: number, data: UpdateHabitDto) {
+    habits.value = habits.value.map(h => h.id === id ? { ...h, ...data } : h)
+
+    try {
+      const { data: updated } = await habitService.update(id, data)
+      habits.value = habits.value.map(h => h.id === id ? updated : h)
+    } catch {
+      await fetchHabits()
+    }
+  }
+
   async function deleteHabit(id: number) {
     habits.value = habits.value.filter(h => h.id !== id)
 
@@ -111,5 +122,5 @@ export function useHabits() {
 
   window.addEventListener('online', flushQueue)
 
-  return { habits, completed, fetchHabits, toggleHabit, createHabit, deleteHabit }
+  return { habits, completed, fetchHabits, toggleHabit, createHabit, updateHabit, deleteHabit }
 }

@@ -6,7 +6,9 @@ use App\Actions\Habit\CreateHabitAction;
 use App\Actions\Habit\DeleteHabitAction;
 use App\Actions\Habit\LogHabitAction;
 use App\Actions\Habit\UnlogHabitAction;
+use App\Actions\Habit\UpdateHabitAction;
 use App\Http\Requests\Habit\StoreHabitRequest;
+use App\Http\Requests\Habit\UpdateHabitRequest;
 use App\Models\Habit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +38,15 @@ class HabitController extends Controller
         $habit = $action->execute($request->user(), $request->validated());
 
         return response()->json(['data' => $habit], 201);
+    }
+
+    public function update(UpdateHabitRequest $request, Habit $habit, UpdateHabitAction $action): JsonResponse
+    {
+        abort_if($request->user()->id !== $habit->user_id, 403);
+
+        $habit = $action->execute($habit, $request->validated());
+
+        return response()->json(['data' => $habit]);
     }
 
     public function destroy(Habit $habit, DeleteHabitAction $action): JsonResponse
