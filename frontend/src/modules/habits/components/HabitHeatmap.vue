@@ -1,23 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
+import { useHabitLogs } from '../composables/useHabitLogs'
 
 const props = defineProps<{
   color: string
   habitId: number
-  loggedDates?: string[]
+  todayLogged: boolean
 }>()
 
 const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 const DAY_LABELS = ['', 'L', '', 'X', '', 'V', '']
 
-function mockLevel(habitId: number, dateStr: string): number {
-  const n = Math.abs(Math.sin(habitId * 9301 + parseInt(dateStr.replace(/-/g, '')) * 49297))
-  if (n > 0.80) return 4
-  if (n > 0.70) return 3
-  if (n > 0.60) return 2
-  if (n > 0.50) return 1
-  return 0
-}
+const { loggedDates, refresh } = useHabitLogs(props.habitId)
+
+watch(() => props.todayLogged, refresh)
 
 type Cell = { date: string | null; level: number; month: number }
 
@@ -25,7 +21,7 @@ const weeks = computed<Cell[][]>(() => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const loggedSet = props.loggedDates ? new Set(props.loggedDates) : null
+  const loggedSet = new Set(loggedDates.value)
 
   const start = new Date(today)
   start.setDate(start.getDate() - 364)
@@ -39,16 +35,13 @@ const weeks = computed<Cell[][]>(() => {
     for (let d = 0; d < 7; d++) {
       const date = new Date(cursor)
       const isFuture = date > today
-      const dateStr = date.toISOString().split('T')[0]
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
-      if (isFuture) {
-        week.push({ date: null, level: 0, month: date.getMonth() })
-      } else {
-        const level = loggedSet
-          ? (loggedSet.has(dateStr) ? 4 : 0)
-          : mockLevel(props.habitId, dateStr)
-        week.push({ date: dateStr, level, month: date.getMonth() })
-      }
+      week.push({
+        date: isFuture ? null : dateStr,
+        level: isFuture ? 0 : (loggedSet.has(dateStr) ? 4 : 0),
+        month: date.getMonth(),
+      })
       cursor.setDate(cursor.getDate() + 1)
     }
     result.push(week)
@@ -104,13 +97,13 @@ function cellColor(level: number): string {
       <div
         v-for="(week, wi) in weeks"
         :key="wi"
-        class="flex flex-col gap-[3px] flex-shrink-0"
+        class="flex flex-col gap-[3px] w-[11px] flex-shrink-0"
       >
         <!-- Etiqueta de mes -->
-        <div class="h-4 flex items-center">
+        <div class="h-4 relative">
           <span
             v-if="monthLabels.find(m => m.col === wi)"
-            class="text-[9px] text-muted-foreground leading-none whitespace-nowrap"
+            class="absolute text-[9px] text-muted-foreground leading-none whitespace-nowrap"
           >
             {{ monthLabels.find(m => m.col === wi)?.label }}
           </span>

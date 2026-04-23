@@ -31,6 +31,11 @@ export const routes = [
         path: 'register',
         name: 'register',
         component: () => import('@/modules/auth/views/RegisterView.vue')
+      },
+      {
+        path: 'callback',
+        name: 'auth-callback',
+        component: () => import('@/modules/auth/views/AuthCallbackView.vue')
       }
     ]
   },

@@ -26,4 +26,8 @@ export const habitService = {
   unlog(id: number, date: string): Promise<void> {
     return http.delete<void>(`/habits/${id}/logs/${date}`)
   },
+
+  getLogs(id: number, year: number): Promise<{ data: string[] }> {
+    return http.get<{ data: string[] }>(`/habits/${id}/logs?year=${year}`)
+  },
 }

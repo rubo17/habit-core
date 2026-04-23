@@ -10,7 +10,7 @@ class LogHabitAction
     public function execute(Habit $habit): HabitLog
     {
         return $habit->logs()->firstOrCreate([
-            'logged_date' => today()->toDateString(),
+            'logged_date' => now()->utc()->toDateString(),
         ]);
     }
 }

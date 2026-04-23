@@ -21,6 +21,7 @@ Route::prefix('v1')->group(function () {
         Route::post('habits', [HabitController::class, 'store']);
         Route::patch('habits/{habit}', [HabitController::class, 'update']);
         Route::delete('habits/{habit}', [HabitController::class, 'destroy']);
+        Route::get('habits/{habit}/logs', [HabitController::class, 'getLogs']);
         Route::post('habits/{habit}/logs', [HabitController::class, 'log']);
         Route::delete('habits/{habit}/logs/{date}', [HabitController::class, 'unlog']);
 
