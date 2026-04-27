@@ -25,7 +25,7 @@ class UserController extends Controller
 
     public function updatePassword(UpdatePasswordRequest $request, UpdatePasswordAction $action): JsonResponse
     {
-        $action->execute($request->user(), $request->validated()['password']);
+        $action->execute($request->user(), $request->validated()['password'], $request->validated()['current_password']);
 
         return response()->json(null, 204);
     }
