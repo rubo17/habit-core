@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useUser } from '../composables/useUser'
 
-const { user, saving, error, update } = useUser()
+const { user, update } = useUser()
 
 const name = ref(user.value.name)
 const email = ref(user.value.email)
@@ -16,12 +16,11 @@ function startEdit() {
 
 function cancel() {
   editing.value = false
-  error.value = null
 }
 
-async function save() {
-  await update({ name: name.value, email: email.value })
-  if (!error.value) editing.value = false
+function save() {
+  editing.value = false
+  update({ name: name.value, email: email.value })
 }
 </script>
 
@@ -45,10 +44,9 @@ async function save() {
         </button>
         <button
           @click="save"
-          :disabled="saving"
-          class="text-xs text-accent hover:text-accent-hover font-medium transition-colors disabled:opacity-50"
+          class="text-xs text-accent hover:text-accent-hover font-medium transition-colors"
         >
-          {{ saving ? 'Guardando...' : 'Guardar' }}
+          Guardar
         </button>
       </div>
     </div>
@@ -78,7 +76,5 @@ async function save() {
         <span v-else class="text-sm text-foreground">{{ user.email || '—' }}</span>
       </div>
     </div>
-
-    <p v-if="error" class="px-4 py-2 text-xs text-danger">{{ error }}</p>
   </div>
 </template>

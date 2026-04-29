@@ -11,9 +11,9 @@ const props = defineProps<{
 const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 const DAY_LABELS = ['', 'L', '', 'X', '', 'V', '']
 
-const { loggedDates, refresh } = useHabitLogs(props.habitId)
+const { loggedDates, applyOptimisticToggle } = useHabitLogs(props.habitId)
 
-watch(() => props.todayLogged, refresh)
+watch(() => props.todayLogged, applyOptimisticToggle)
 
 type Cell = { date: string | null; level: number; month: number }
 
@@ -59,7 +59,7 @@ const monthLabels = computed(() => {
     if (!first) return
     const month = new Date(first.date!).getMonth()
     if (month !== lastMonth) {
-      labels.push({ label: MONTHS[month], col })
+      labels.push({ label: MONTHS[month]!, col })
       lastMonth = month
     }
   })
@@ -73,7 +73,7 @@ function cellColor(level: number): string {
   const hex = props.color
   return level === 4
     ? hex
-    : `${hex}${Math.round(opacities[level] * 255).toString(16).padStart(2, '0')}`
+    : `${hex}${Math.round(opacities[level]! * 255).toString(16).padStart(2, '0')}`
 }
 </script>
 

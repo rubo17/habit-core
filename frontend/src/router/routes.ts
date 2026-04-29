@@ -1,5 +1,7 @@
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
+import LoginView from '@/modules/auth/views/LoginView.vue'
+import SettingsView from '@/modules/settings/views/SettingsView.vue'
 
 export const routes = [
   {
@@ -12,9 +14,14 @@ export const routes = [
         component: () => import('@/modules/habits/views/HabitView.vue')
       },
       {
+        path: 'stats',
+        name: 'stats',
+        component: () => import('@/modules/stats/views/StatsView.vue')
+      },
+      {
         path: 'settings',
         name: 'settings',
-        component: () => import('@/modules/settings/views/SettingsView.vue')
+        component:SettingsView
       }
     ]
   },
@@ -25,7 +32,7 @@ export const routes = [
       {
         path: 'login',
         name: 'login',
-        component: () => import('@/modules/auth/views/LoginView.vue')
+        component:LoginView
       },
       {
         path: 'register',

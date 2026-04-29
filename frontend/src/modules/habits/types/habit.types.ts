@@ -68,3 +68,5 @@ export type SyncOperation =
   | { type: 'delete'; id: number }
   | { type: 'log'; id: number }
   | { type: 'unlog'; id: number; date: string }
+  | { type: 'create-category'; payload: CreateCategoryDto; tempId: number }
+  | { type: 'delete-category'; id: number }
