@@ -10,6 +10,7 @@ import { useCategories } from '../composables/useCategories'
 import { useModal } from '@/shared/composables/useModal'
 import type { Habit, HabitCategory } from '../types/habit.types'
 import EmptyHabits from '../components/EmptyHabits.vue'
+import BaseSection from '@/shared/components/BaseSection.vue'
 
 const { habits, completed, fetchHabits, toggleHabit, deleteHabit } = useHabits()
 const { categories, fetchCategories, deleteCategory } = useCategories()
@@ -40,7 +41,7 @@ const filteredHabits = computed(() =>
 </script>
 
 <template>
-  <section class="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-4">
+  <BaseSection>
     <div v-if="habits.length" class="flex gap-2 overflow-x-auto pb-1 scrollbar-hidden">
       <HabitCategoryCard
         :category="ALL"
@@ -68,10 +69,10 @@ const filteredHabits = computed(() =>
         @edit="openEditModal(habit)"
       />
     </div>
-
+  
     <EmptyHabits v-else />
-  </section>
-
+    
+  </BaseSection>
   <button
     @click="createModal.open()"
     class="fixed bottom-20 right-4 md:bottom-8 md:right-8 w-14 h-14 rounded-full bg-accent hover:bg-accent-hover text-accent-foreground flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
