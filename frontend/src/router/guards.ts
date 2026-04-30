@@ -1,6 +1,6 @@
 import type { Router } from 'vue-router'
 
-const PUBLIC_ROUTES = ['login', 'register']
+const PUBLIC_ROUTES = ['login', 'register', 'auth-callback']
 
 export function setupGuards(router: Router) {
   router.beforeEach((to) => {

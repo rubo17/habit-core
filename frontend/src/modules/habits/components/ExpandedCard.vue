@@ -36,6 +36,7 @@ const habitColor = props.habit.color ?? '#6366f1'
         <HabitHeatmap
           :habit-id="habit.id"
           :color="habitColor"
+          :today-logged="habit.today_logged"
         />
 
         </div>

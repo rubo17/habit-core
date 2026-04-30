@@ -1,5 +1,5 @@
 import { http } from '@/shared/utils/http'
-import type { CreateHabitDto, HabitListResponse, HabitResponse } from '../types/habit.types'
+import type { CreateHabitDto, HabitListResponse, HabitResponse, UpdateHabitDto } from '../types/habit.types'
 
 export const habitService = {
   getAll(categoryId?: number): Promise<HabitListResponse> {
@@ -9,6 +9,10 @@ export const habitService = {
 
   create(data: CreateHabitDto): Promise<HabitResponse> {
     return http.post<HabitResponse>('/habits', data)
+  },
+
+  update(id: number, data: UpdateHabitDto): Promise<HabitResponse> {
+    return http.patch<HabitResponse>(`/habits/${id}`, data)
   },
 
   remove(id: number): Promise<void> {
@@ -21,5 +25,9 @@ export const habitService = {
 
   unlog(id: number, date: string): Promise<void> {
     return http.delete<void>(`/habits/${id}/logs/${date}`)
+  },
+
+  getLogs(id: number, year: number): Promise<{ data: string[] }> {
+    return http.get<{ data: string[] }>(`/habits/${id}/logs?year=${year}`)
   },
 }

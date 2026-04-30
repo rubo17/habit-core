@@ -33,7 +33,7 @@ defineProps<{
 
 const links: { to: string; icon: IconName; label: string }[] = [
   { to: '/habits', icon: 'home', label: 'Home' },
-  { to: '#', icon: 'chart', label: 'Stats' },
+  { to: '/stats', icon: 'chart', label: 'Stats' },
   { to: '/settings', icon: 'settings', label: 'Settings' },
 ]
 </script>

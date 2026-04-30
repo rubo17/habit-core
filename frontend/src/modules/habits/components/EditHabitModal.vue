@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import BaseModal from '@/shared/components/BaseModal.vue'
 import BaseSelect from '@/shared/components/BaseSelect.vue'
 import HabitIcon from '@/shared/components/icons/HabitIcon.vue'
 import HabitIconPicker from './HabitIconPicker.vue'
 import CreateCategoryModal from './CreateCategoryModal.vue'
 import { useHabits } from '../composables/useHabits'
-import { useCategories } from '../composables/useCategories'
 import { useModal } from '@/shared/composables/useModal'
-import type { CreateHabitDto, HabitCategory } from '../types/habit.types'
-import DefaultCategoryIcon from './icons/DefaultCategoryIcon.vue'
+import type { Habit, HabitCategory, UpdateHabitDto } from '../types/habit.types'
 import { HABIT_COLORS } from '@/constants/habitColors'
 import { HABIT_DAYS, ALL_DAYS } from '@/constants/habitDays'
 
-defineProps<{ isOpen: boolean }>()
-const emit = defineEmits<{ close: [] }>()
+const props = defineProps<{ isOpen: boolean; habit: Habit; categories: HabitCategory[] }>()
+const emit = defineEmits<{ close: []; categoryCreated: [category: HabitCategory] }>()
 
-const { createHabit } = useHabits()
-const { categories, fetchCategories } = useCategories()
+const { updateHabit } = useHabits()
 const categoryModal = useModal()
 
-onMounted(fetchCategories)
-
-const DEFAULT: CreateHabitDto = {
-  name: '',
-  frequency: 'daily',
-  category_id: null,
-  reminder_time: null,
-  reminder_days: null,
-  color: '#6366f1',
-  icon: 'sparkles',
-}
-
-const form = reactive<CreateHabitDto>({ ...DEFAULT })
+const form = reactive<UpdateHabitDto>({})
 const showIconPicker = ref(false)
 const selectedDays = ref<number[]>([...ALL_DAYS])
+
+watch(() => props.isOpen, (open) => {
+  if (open) {
+    Object.assign(form, {
+      name: props.habit.name,
+      category_id: props.habit.category_id,
+      reminder_time: props.habit.reminder_time,
+      reminder_days: props.habit.reminder_days,
+      color: props.habit.color ?? '#6366f1',
+      icon: props.habit.icon ?? 'sparkles',
+    })
+    selectedDays.value = props.habit.reminder_days ?? [...ALL_DAYS]
+    showIconPicker.value = false
+  }
+}, { immediate: true })
 
 watch(() => form.reminder_time, (val) => {
   if (!val) {
@@ -53,34 +53,29 @@ function toggleDay(day: number) {
 
 function onCategoryCreated(category: HabitCategory) {
   form.category_id = category.id
-}
-
-function resetForm() {
-  Object.assign(form, DEFAULT)
-  showIconPicker.value = false
-  selectedDays.value = [...ALL_DAYS]
+  emit('categoryCreated', category)
 }
 
 function close() {
-  resetForm()
+  showIconPicker.value = false
   emit('close')
 }
 
 async function submit() {
-  if (!form.name.trim()) return
+  if (!form.name?.trim()) return
 
   const days = selectedDays.value
   const reminderDays = form.reminder_time && days.length < 7 && days.length > 0
     ? days
     : null
 
-  await createHabit({ ...form, reminder_days: reminderDays })
+  await updateHabit(props.habit.id, { ...form, reminder_days: reminderDays })
   close()
 }
 </script>
 
 <template>
-  <BaseModal title="Nuevo hábito" :open="isOpen" size="xl" @close="close">
+  <BaseModal title="Editar hábito" :open="isOpen" size="xl" @close="close">
     <div class="flex flex-col gap-5 pt-1">
 
       <div class="flex items-center gap-3">
@@ -89,10 +84,9 @@ async function submit() {
           @click="showIconPicker = !showIconPicker"
           :style="{ backgroundColor: form.color ?? '#6366f1' }"
           class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white transition-transform duration-150 active:scale-95"
-        > 
-          <HabitIcon v-if="form.icon" :name="form.icon" :size="22" />
-          <DefaultCategoryIcon v-else :size="22" />
-      </button>
+        >
+          <HabitIcon :name="form.icon ?? 'sparkles'" :size="22" />
+        </button>
 
         <input
           v-model="form.name"
@@ -179,10 +173,10 @@ async function submit() {
       <button
         type="button"
         @click="submit"
-        :disabled="!form.name.trim()"
+        :disabled="!form.name?.trim()"
         class="w-full py-3 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground font-medium transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        Crear hábito
+        Guardar
       </button>
 
     </div>

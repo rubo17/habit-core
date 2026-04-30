@@ -1,5 +1,5 @@
 import { http } from '@/shared/utils/http'
-import type { AuthResponse, LoginCredentials, RegisterCredentials } from '../types/auth.types'
+import type { AuthResponse, AuthUser, LoginCredentials, RegisterCredentials } from '../types/auth.types'
 
 export const authService = {
   login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -10,4 +10,7 @@ export const authService = {
     return http.post<AuthResponse>('/auth/register', credentials)
   },
 
+  getCurrentUser(): Promise<{ data: AuthUser }> {
+    return http.get<{ data: AuthUser }>('/user')
+  },
 }

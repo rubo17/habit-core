@@ -2,9 +2,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/auth.service'
 import { clearCache } from '@/shared/composables/useLocalStorage'
+import { dbClear, STORES } from '@/shared/utils/db'
 import type { LoginCredentials, RegisterCredentials } from '../types/auth.types'
 
-const USER_KEYS = ['token', 'user', 'habits', 'habits:sync-queue']
+const USER_KEYS = ['token', 'user']
 
 export function useAuth() {
   const router = useRouter()
@@ -43,9 +44,12 @@ export function useAuth() {
     }
   }
 
-  function logout() {
+  async function logout() {
     USER_KEYS.forEach(key => localStorage.removeItem(key))
     clearCache(USER_KEYS)
+    await dbClear(STORES.HABITS)
+    await dbClear(STORES.SYNC_QUEUE)
+    await dbClear(STORES.USER_SYNC_QUEUE)
     router.push({ name: 'login' })
   }
 
