@@ -11,6 +11,7 @@ import { useModal } from '@/shared/composables/useModal'
 import type { Habit, HabitCategory } from '../types/habit.types'
 import EmptyHabits from '../components/EmptyHabits.vue'
 import BaseSection from '@/shared/components/BaseSection.vue'
+import ModalDeleteConfirm from '@/shared/components/ModalDeleteConfirm.vue'
 
 const { habits, completed, fetchHabits, toggleHabit, deleteHabit } = useHabits()
 const { categories, fetchCategories, deleteCategory } = useCategories()
@@ -19,6 +20,8 @@ onMounted(() => { fetchHabits(); fetchCategories() })
 const createModal = useModal()
 const editModal = useModal()
 const habitToEdit = ref<Habit | null>(null)
+const habitToDelete = ref<Habit | null>(null)
+const deleteModal = useModal()
 
 const ALL: HabitCategory = { id: 0, name: 'Todos' }
 const selectedCategory = ref<HabitCategory>(ALL)
@@ -33,6 +36,15 @@ async function removeCategory(category: HabitCategory) {
   await deleteCategory(category.id)
 }
 
+function openDeleteModal(habit: Habit) {
+  habitToDelete.value = habit
+  deleteModal.open()
+}
+function handleDelete() {
+  if (!habitToDelete.value) return
+  deleteHabit(habitToDelete.value.id)
+  deleteModal.close()
+}
 const filteredHabits = computed(() =>
   selectedCategory.value.id === 0
     ? habits.value
@@ -65,7 +77,7 @@ const filteredHabits = computed(() =>
         :habit="habit"
         :completed="completed.has(habit.id)"
         @toggle="toggleHabit(habit.id)"
-        @delete="deleteHabit(habit.id)"
+        @delete="openDeleteModal(habit)"
         @edit="openEditModal(habit)"
       />
     </div>
@@ -88,6 +100,13 @@ const filteredHabits = computed(() =>
     :categories="categories"
     @close="editModal.close()"
     @category-created="fetchCategories"
+  />
+    <ModalDeleteConfirm
+    :open="deleteModal.isOpen.value"
+    title="Eliminar hábito"
+    :description="`¿Eliminar '${habitToDelete?.name}'? Esta acción no se puede deshacer.`"
+    @close="deleteModal.close()"
+    @confirm="handleDelete"
   />
 
 </template>

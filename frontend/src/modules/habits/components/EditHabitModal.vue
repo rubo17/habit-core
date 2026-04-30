@@ -20,6 +20,7 @@ const categoryModal = useModal()
 const form = reactive<UpdateHabitDto>({})
 const showIconPicker = ref(false)
 const selectedDays = ref<number[]>([...ALL_DAYS])
+const selectedTargetDays = ref<number[]>([])
 
 watch(() => props.isOpen, (open) => {
   if (open) {
@@ -28,10 +29,12 @@ watch(() => props.isOpen, (open) => {
       category_id: props.habit.category_id,
       reminder_time: props.habit.reminder_time,
       reminder_days: props.habit.reminder_days,
+      target_days: props.habit.target_days,
       color: props.habit.color ?? '#6366f1',
       icon: props.habit.icon ?? 'sparkles',
     })
     selectedDays.value = props.habit.reminder_days ?? [...ALL_DAYS]
+    selectedTargetDays.value = props.habit.target_days ?? []
     showIconPicker.value = false
   }
 }, { immediate: true })
@@ -48,6 +51,14 @@ function toggleDay(day: number) {
     selectedDays.value = selectedDays.value.filter(d => d !== day)
   } else {
     selectedDays.value = [...selectedDays.value, day]
+  }
+}
+
+function toggleTargetDay(day: number) {
+  if (selectedTargetDays.value.includes(day)) {
+    selectedTargetDays.value = selectedTargetDays.value.filter(d => d !== day)
+  } else {
+    selectedTargetDays.value = [...selectedTargetDays.value, day]
   }
 }
 
@@ -69,7 +80,9 @@ async function submit() {
     ? days
     : null
 
-  await updateHabit(props.habit.id, { ...form, reminder_days: reminderDays })
+  const targetDays = selectedTargetDays.value.length > 0 ? selectedTargetDays.value : null
+
+  await updateHabit(props.habit.id, { ...form, reminder_days: reminderDays, target_days: targetDays })
   close()
 }
 </script>
@@ -167,6 +180,26 @@ async function submit() {
               {{ day.label }}
             </button>
           </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <p class="text-xs font-medium text-muted-foreground">Días que aplica <span class="font-normal">(opcional, vacío = todos los días)</span></p>
+        <div class="flex gap-2">
+          <button
+            v-for="day in HABIT_DAYS"
+            :key="day.value"
+            type="button"
+            @click="toggleTargetDay(day.value)"
+            :class="[
+              'w-9 h-9 rounded-full text-xs font-medium transition-colors duration-150',
+              selectedTargetDays.includes(day.value)
+                ? 'bg-accent text-accent-foreground'
+                : 'bg-surface-raised text-muted-foreground',
+            ]"
+          >
+            {{ day.label }}
+          </button>
         </div>
       </div>
 

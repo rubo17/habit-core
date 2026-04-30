@@ -18,12 +18,14 @@ class Habit extends Model
         'frequency',
         'reminder_time',
         'reminder_days',
+        'target_days',
         'color',
         'icon',
     ];
 
     protected $casts = [
         'reminder_days' => 'array',
+        'target_days'   => 'array',
     ];
 
     public function user(): BelongsTo

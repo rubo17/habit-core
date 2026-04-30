@@ -28,6 +28,7 @@ const DEFAULT: CreateHabitDto = {
   category_id: null,
   reminder_time: null,
   reminder_days: null,
+  target_days: null,
   color: '#6366f1',
   icon: 'sparkles',
 }
@@ -35,6 +36,7 @@ const DEFAULT: CreateHabitDto = {
 const form = reactive<CreateHabitDto>({ ...DEFAULT })
 const showIconPicker = ref(false)
 const selectedDays = ref<number[]>([...ALL_DAYS])
+const selectedTargetDays = ref<number[]>([])
 
 watch(() => form.reminder_time, (val) => {
   if (!val) {
@@ -51,6 +53,14 @@ function toggleDay(day: number) {
   }
 }
 
+function toggleTargetDay(day: number) {
+  if (selectedTargetDays.value.includes(day)) {
+    selectedTargetDays.value = selectedTargetDays.value.filter(d => d !== day)
+  } else {
+    selectedTargetDays.value = [...selectedTargetDays.value, day]
+  }
+}
+
 function onCategoryCreated(category: HabitCategory) {
   form.category_id = category.id
 }
@@ -59,6 +69,7 @@ function resetForm() {
   Object.assign(form, DEFAULT)
   showIconPicker.value = false
   selectedDays.value = [...ALL_DAYS]
+  selectedTargetDays.value = []
 }
 
 function close() {
@@ -74,7 +85,9 @@ async function submit() {
     ? days
     : null
 
-  await createHabit({ ...form, reminder_days: reminderDays })
+  const targetDays = selectedTargetDays.value.length > 0 ? selectedTargetDays.value : null
+
+  await createHabit({ ...form, reminder_days: reminderDays, target_days: targetDays })
   close()
 }
 </script>
@@ -173,6 +186,26 @@ async function submit() {
               {{ day.label }}
             </button>
           </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <p class="text-xs font-medium text-muted-foreground">Días que aplica <span class="font-normal">(opcional, vacío = todos los días)</span></p>
+        <div class="flex gap-2">
+          <button
+            v-for="day in HABIT_DAYS"
+            :key="day.value"
+            type="button"
+            @click="toggleTargetDay(day.value)"
+            :class="[
+              'w-9 h-9 rounded-full text-xs font-medium transition-colors duration-150',
+              selectedTargetDays.includes(day.value)
+                ? 'bg-accent text-accent-foreground'
+                : 'bg-surface-raised text-muted-foreground',
+            ]"
+          >
+            {{ day.label }}
+          </button>
         </div>
       </div>
 

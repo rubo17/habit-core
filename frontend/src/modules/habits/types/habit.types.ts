@@ -13,6 +13,7 @@ export interface Habit {
   frequency: 'daily'
   reminder_time: string | null
   reminder_days: number[] | null
+  target_days: number[] | null
   color: string | null
   icon: string | null
   today_logged: boolean
@@ -27,6 +28,7 @@ export interface CreateHabitDto {
   frequency: 'daily'
   reminder_time?: string | null
   reminder_days?: number[] | null
+  target_days?: number[] | null
   color?: string | null
   icon?: string | null
 }
@@ -36,6 +38,7 @@ export interface UpdateHabitDto {
   name?: string
   reminder_time?: string | null
   reminder_days?: number[] | null
+  target_days?: number[] | null
   color?: string | null
   icon?: string | null
 }
