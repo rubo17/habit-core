@@ -11,9 +11,8 @@ class UpdateHabitRequest extends FormRequest
         return [
             'category_id'     => 'nullable|exists:categories,id',
             'name'            => 'sometimes|string|max:255',
-            'reminder_time'   => 'nullable|date_format:H:i',
-            'reminder_days'   => 'nullable|array',
-            'reminder_days.*' => 'integer|between:0,6',
+            'reminder_times'   => 'nullable|array',
+            'reminder_times.*' => 'string|date_format:H:i',
             'target_days'     => 'nullable|array',
             'target_days.*'   => 'integer|between:0,6',
             'color'           => 'nullable|string|max:50',

@@ -11,8 +11,7 @@ export interface Habit {
   category?: HabitCategory | null
   name: string
   frequency: 'daily'
-  reminder_time: string | null
-  reminder_days: number[] | null
+  reminder_times: Record<string, string> | null
   target_days: number[] | null
   color: string | null
   icon: string | null
@@ -26,8 +25,7 @@ export interface CreateHabitDto {
   category_id: number | null
   name: string
   frequency: 'daily'
-  reminder_time?: string | null
-  reminder_days?: number[] | null
+  reminder_times?: Record<string, string> | null
   target_days?: number[] | null
   color?: string | null
   icon?: string | null
@@ -36,8 +34,7 @@ export interface CreateHabitDto {
 export interface UpdateHabitDto {
   category_id?: number | null
   name?: string
-  reminder_time?: string | null
-  reminder_days?: number[] | null
+  reminder_times?: Record<string, string> | null
   target_days?: number[] | null
   color?: string | null
   icon?: string | null

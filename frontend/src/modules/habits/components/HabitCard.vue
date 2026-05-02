@@ -53,10 +53,10 @@ const { isExpanded, toggleExpand } = useHabitCard()
 
         <div class="flex-1 min-w-0">
           <p class="text-foreground font-medium truncate">{{ habit.name }}</p>
-          <p v-if="habit.category || habit.reminder_time" class="text-muted-foreground text-sm flex items-center gap-1">
+          <p v-if="habit.category || habit.reminder_times" class="text-muted-foreground text-sm flex items-center gap-1">
             <span v-if="habit.category">{{ habit.category.name }}</span>
-            <span v-if="habit.category && habit.reminder_time">·</span>
-            <span v-if="habit.reminder_time">{{ habit.reminder_time }}</span>
+            <span v-if="habit.category && habit.reminder_times">·</span>
+            <span v-if="habit.reminder_times">🔔 {{ Object.keys(habit.reminder_times).length }}d</span>
           </p>
         </div>
 
