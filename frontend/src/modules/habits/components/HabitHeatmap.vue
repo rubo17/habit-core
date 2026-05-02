@@ -15,7 +15,11 @@ const { loggedDates, applyOptimisticToggle } = useHabitLogs(props.habitId)
 
 watch(() => props.todayLogged, applyOptimisticToggle)
 
-type Cell = { date: string | null; level: number; month: number }
+type Cell = {
+  date: string | null
+  level: number
+  month: number
+}
 
 const weeks = computed<Cell[][]>(() => {
   const today = new Date()
@@ -32,18 +36,24 @@ const weeks = computed<Cell[][]>(() => {
 
   while (result.length < 53) {
     const week: Cell[] = []
+
     for (let d = 0; d < 7; d++) {
       const date = new Date(cursor)
       const isFuture = date > today
-      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+      const dateStr = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
       week.push({
         date: isFuture ? null : dateStr,
-        level: isFuture ? 0 : (loggedSet.has(dateStr) ? 4 : 0),
+        level: isFuture ? 0 : loggedSet.has(dateStr) ? 4 : 0,
         month: date.getMonth(),
       })
+
       cursor.setDate(cursor.getDate() + 1)
     }
+
     result.push(week)
   }
 
@@ -55,11 +65,16 @@ const monthLabels = computed(() => {
   let lastMonth = -1
 
   weeks.value.forEach((week, col) => {
-    const first = week.find(d => d.date)
-    if (!first) return
-    const month = new Date(first.date!).getMonth()
+    const first = week.find((d) => d.date)
+    if (!first?.date) return
+
+    const month = new Date(first.date).getMonth()
+
     if (month !== lastMonth) {
-      labels.push({ label: MONTHS[month]!, col })
+      labels.push({
+        label: MONTHS[month]!,
+        col,
+      })
       lastMonth = month
     }
   })
@@ -69,56 +84,62 @@ const monthLabels = computed(() => {
 
 function cellColor(level: number): string {
   if (level === 0) return 'var(--color-surface-raised)'
-  const opacities = [0, 0.25, 0.45, 0.70, 1]
+
+  const opacities = [0, 0.25, 0.45, 0.7, 1]
   const hex = props.color
+
   return level === 4
     ? hex
-    : `${hex}${Math.round(opacities[level]! * 255).toString(16).padStart(2, '0')}`
+    : `${hex}${Math.round(opacities[level]! * 255)
+        .toString(16)
+        .padStart(2, '0')}`
 }
 </script>
 
 <template>
-  <div class="overflow-x-auto scrollbar-hidden">
-    <div class="flex gap-[3px] min-w-max">
+  <div class="w-full overflow-x-auto scrollbar-hidden">
+    <div class="flex w-full gap-[3px] min-w-[700px]">
 
-      <!-- Etiquetas de días -->
+      <!-- Labels izquierda -->
       <div class="flex flex-col gap-[3px] mr-1 flex-shrink-0">
         <div class="h-4" />
+
         <div
           v-for="(label, i) in DAY_LABELS"
           :key="i"
-          class="w-4 h-[11px] flex items-center justify-end text-[9px] text-muted-foreground leading-none"
+          class="min-h-[11px] flex items-center justify-end text-[9px] text-muted-foreground leading-none"
         >
           {{ label }}
         </div>
       </div>
 
-      <!-- Columnas de semanas -->
-      <div
-        v-for="(week, wi) in weeks"
-        :key="wi"
-        class="flex flex-col gap-[3px] w-[11px] flex-shrink-0"
-      >
-        <!-- Etiqueta de mes -->
-        <div class="h-4 relative">
-          <span
-            v-if="monthLabels.find(m => m.col === wi)"
-            class="absolute text-[9px] text-muted-foreground leading-none whitespace-nowrap"
-          >
-            {{ monthLabels.find(m => m.col === wi)?.label }}
-          </span>
-        </div>
-
-        <!-- Celdas del día -->
+      <!-- Grid -->
+      <div class="flex flex-1 gap-[3px]">
         <div
-          v-for="(cell, di) in week"
-          :key="di"
-          :title="cell.date ?? ''"
-          class="w-[11px] h-[11px] rounded-[2px] transition-opacity duration-150 hover:opacity-80"
-          :style="{ backgroundColor: cellColor(cell.level) }"
-        />
-      </div>
+          v-for="(week, wi) in weeks"
+          :key="wi"
+          class="flex flex-col flex-1 min-w-[11px] gap-[3px]"
+        >
+          <!-- Mes -->
+          <div class="h-4 relative">
+            <span
+              v-if="monthLabels.find((m) => m.col === wi)"
+              class="absolute text-[9px] text-muted-foreground whitespace-nowrap leading-none"
+            >
+              {{ monthLabels.find((m) => m.col === wi)?.label }}
+            </span>
+          </div>
 
+          <!-- Días -->
+          <div
+            v-for="(cell, di) in week"
+            :key="di"
+            :title="cell.date ?? ''"
+            class="w-full aspect-square rounded-[2px] transition-opacity duration-150 hover:opacity-80"
+            :style="{ backgroundColor: cellColor(cell.level) }"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>

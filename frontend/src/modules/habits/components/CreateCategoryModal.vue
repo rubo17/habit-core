@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BaseModal from '@/shared/components/BaseModal.vue'
+import BaseButton from '@/shared/components/BaseButton.vue'
 import HabitIcon from '@/shared/components/icons/HabitIcon.vue'
 import HabitIconPicker from './HabitIconPicker.vue'
 import { useCategories } from '../composables/useCategories'
@@ -38,7 +39,7 @@ async function submit() {
 </script>
 
 <template>
-  <BaseModal title="Nueva categoría" :open="isOpen" size="sm" @close="close">
+  <BaseModal title="Nueva categoría" :open="isOpen" size="sm" :level="2" @close="close">
     <div class="flex flex-col gap-4 pt-1">
 
       <div class="flex items-center gap-3">
@@ -72,14 +73,9 @@ async function submit() {
         </div>
       </div>
 
-      <button
-        type="button"
-        @click="submit"
-        :disabled="!name.trim() || loading"
-        class="w-full py-3 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground font-medium transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+      <BaseButton :disabled="!name.trim() || loading" @click="submit">
         Crear
-      </button>
+      </BaseButton>
 
     </div>
   </BaseModal>

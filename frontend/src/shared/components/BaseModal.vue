@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onUnmounted } from 'vue'
+import { watch, onUnmounted, computed } from 'vue'
 import { useBreakpoint } from '../composables/useBreakpoint'
 import CloseIcon from './icons/CloseIcon.vue';
 
@@ -7,7 +7,12 @@ const props = withDefaults(defineProps<{
   open: boolean
   title?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
-}>(), { size: 'md' })
+  level?: 1 | 2
+}>(), { size: 'md', level: 1 })
+
+const zBackdrop  = computed(() => props.level === 2 ? 'z-60' : 'z-40')
+const zContent   = computed(() => props.level === 2 ? 'z-70' : 'z-50')
+const backdropBg = computed(() => props.level === 2 ? 'bg-black/60 backdrop-blur-md' : 'bg-black/50 backdrop-blur-sm')
 
 const emit = defineEmits<{ close: [] }>()
 
@@ -53,7 +58,7 @@ onUnmounted(() => {
     >
       <div
         v-if="open"
-        class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        :class="['fixed inset-0', backdropBg, zBackdrop]"
         @click="emit('close')"
       />
     </Transition>
@@ -70,7 +75,7 @@ onUnmounted(() => {
     >
       <div
         v-if="open"
-        class="fixed inset-x-0 bottom-0 z-50 bg-surface rounded-t-2xl shadow-xl"
+        :class="['fixed inset-x-0 bottom-0 bg-surface rounded-t-2xl shadow-xl', zContent]"
       >
         <div class="flex justify-center pt-3 pb-1">
           <div class="w-10 h-1 rounded-full bg-border" />
@@ -104,7 +109,7 @@ onUnmounted(() => {
     >
       <div
         v-if="open"
-        class="fixed inset-0 z-50 flex items-center justify-center px-4"
+        :class="['fixed inset-0 flex items-center justify-center px-4', zContent]"
         @click.self="emit('close')"
       >
         <div :class="['w-full bg-surface rounded-2xl shadow-xl overflow-hidden', sizeClass[size]]">
