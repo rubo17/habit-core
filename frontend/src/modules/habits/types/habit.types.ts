@@ -12,6 +12,7 @@ export interface Habit {
   name: string
   frequency: 'daily'
   reminder_times: Record<string, string> | null
+  scheduled_for_today:boolean
   target_days: number[] | null
   color: string | null
   icon: string | null
@@ -68,5 +69,6 @@ export type SyncOperation =
   | { type: 'delete'; id: number }
   | { type: 'log'; id: number }
   | { type: 'unlog'; id: number; date: string }
+  | { type: 'update'; id: number; payload: UpdateHabitDto }
   | { type: 'create-category'; payload: CreateCategoryDto; tempId: number }
   | { type: 'delete-category'; id: number }

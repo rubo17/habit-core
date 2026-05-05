@@ -76,12 +76,14 @@ function close() {
 }
 
 import { toRaw } from 'vue'
+import { ALL_DAYS } from '@/constants/habitDays'
 import SchedulePicker from './SchedulePicker.vue'
 
 async function submit() {
   if (!form.name.trim()) return
 
   const payload = structuredClone(toRaw(form))
+  payload.target_days = payload.target_days ?? ALL_DAYS
 
   await createHabit(payload)
   close()

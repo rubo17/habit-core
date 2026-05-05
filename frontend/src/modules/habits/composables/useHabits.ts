@@ -51,6 +51,7 @@ function toggleHabit(id: number) {
 
 async function createHabit(data: CreateHabitDto) {
   const tempId = Date.now()
+  const todayDow = new Date().getDay()
   const tempHabit: Habit = {
     ...data,
     id: tempId,
@@ -61,6 +62,7 @@ async function createHabit(data: CreateHabitDto) {
     color: data.color ?? null,
     icon: data.icon ?? null,
     today_logged: false,
+    scheduled_for_today: !data.target_days || data.target_days.includes(todayDow),
     deleted_at: null,
     created_at: '',
     updated_at: '',
@@ -82,14 +84,22 @@ async function createHabit(data: CreateHabitDto) {
 }
 
 async function updateHabit(id: number, data: UpdateHabitDto) {
-  habits.value = habits.value.map(h => h.id === id ? { ...h, ...data } : h)
+  habits.value = habits.value.map(h => {
+    if (h.id !== id) return h
+    const category = data.category_id === undefined
+      ? h.category
+      : (categories.value.find(c => c.id === data.category_id) ?? null)
+    return { ...h, ...data, category }
+  })
 
   try {
     const { data: updated } = await habitService.update(id, data)
     habits.value = habits.value.map(h => h.id === id ? updated : h)
     await dbPut(STORES.HABITS, updated)
   } catch {
-    await fetchHabits()
+    const op: SyncOperation = { type: 'update', id, payload: data }
+    syncQueue.value = [...syncQueue.value, op]
+    await dbAdd(STORES.SYNC_QUEUE, op)
   }
 }
 
@@ -136,6 +146,11 @@ async function flushQueue() {
         habits.value = habits.value.map(h => h.id === op.tempId ? created : h)
         await dbDelete(STORES.HABITS, op.tempId)
         await dbPut(STORES.HABITS, created)
+      }
+      if (op.type === 'update') {
+        const { data: updated } = await habitService.update(op.id, op.payload)
+        habits.value = habits.value.map(h => h.id === op.id ? updated : h)
+        await dbPut(STORES.HABITS, updated)
       }
       if (op.type === 'delete') await habitService.remove(op.id)
       if (op.type === 'log') await habitService.log(op.id)

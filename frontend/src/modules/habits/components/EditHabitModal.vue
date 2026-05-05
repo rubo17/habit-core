@@ -11,7 +11,7 @@ import { useHabits } from '../composables/useHabits'
 import { useModal } from '@/shared/composables/useModal'
 import type { Habit, HabitCategory, UpdateHabitDto } from '../types/habit.types'
 import { HABIT_COLORS } from '@/constants/habitColors'
-import { HABIT_DAY_NAMES } from '@/constants/habitDays'
+import { HABIT_DAY_NAMES, ALL_DAYS } from '@/constants/habitDays'
 import SchedulePicker from './SchedulePicker.vue'
 
 const props = defineProps<{ isOpen: boolean; habit: Habit; categories: HabitCategory[] }>()
@@ -73,7 +73,8 @@ function close() {
 
 async function submit() {
   if (!form.name?.trim()) return
-  await updateHabit(props.habit.id, { ...form })
+  const payload = { ...form, target_days: form.target_days ?? ALL_DAYS }
+  await updateHabit(props.habit.id, payload)
   close()
 }
 </script>
