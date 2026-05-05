@@ -6,6 +6,11 @@ export function clearCache(keys: string[]) {
   keys.forEach(key => cache.delete(key))
 }
 
+export function setCache(key: string, value: unknown) {
+  const entry = cache.get(key)
+  if (entry) entry.value = value
+}
+
 export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
   if (cache.has(key)) {
     return cache.get(key) as Ref<T>

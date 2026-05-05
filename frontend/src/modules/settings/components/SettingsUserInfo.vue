@@ -7,20 +7,36 @@ const { user, update } = useUser()
 const name = ref(user.value.name)
 const email = ref(user.value.email)
 const editing = ref(false)
+const saving = ref(false)
+const error = ref<string | null>(null)
+const success = ref(false)
 
 function startEdit() {
   name.value = user.value.name
   email.value = user.value.email
   editing.value = true
+  error.value = null
+  success.value = false
 }
 
 function cancel() {
   editing.value = false
+  error.value = null
 }
 
-function save() {
-  editing.value = false
-  update({ name: name.value, email: email.value })
+async function save() {
+  error.value = null
+  saving.value = true
+
+  try {
+    await update({ name: name.value, email: email.value })
+    success.value = true
+    editing.value = false
+  } catch (e: unknown) {
+    error.value = e instanceof Error ? e.message : 'Error al guardar los cambios'
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -44,12 +60,16 @@ function save() {
         </button>
         <button
           @click="save"
-          class="text-xs text-accent hover:text-accent-hover font-medium transition-colors"
+          :disabled="saving"
+          class="text-xs text-accent hover:text-accent-hover font-medium transition-colors disabled:opacity-50"
         >
-          Guardar
+          {{ saving ? 'Guardando...' : 'Guardar' }}
         </button>
       </div>
     </div>
+
+    <p v-if="success && !editing" class="px-4 py-2 text-xs text-success">Perfil actualizado correctamente</p>
+    <p v-if="error" class="px-4 py-2 text-xs text-danger">{{ error }}</p>
 
     <div class="flex flex-col divide-y divide-border">
       <div class="flex flex-col gap-0.5 px-4 py-3">

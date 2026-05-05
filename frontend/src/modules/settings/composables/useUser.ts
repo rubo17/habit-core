@@ -10,15 +10,21 @@ const DEFAULT_USER: AuthUser = { id: 0, name: '', email: '' }
 const user = useLocalStorage<AuthUser>('user', DEFAULT_USER)
 
 async function update(data: UserUpdatePayload) {
+  const originalUser = { ...user.value }
   user.value = { ...user.value, ...data }
 
   try {
     const response = await userService.update(data)
     user.value = response.data
     await dbClear(STORES.USER_SYNC_QUEUE)
-  } catch {
-    await dbClear(STORES.USER_SYNC_QUEUE)
-    await dbAdd(STORES.USER_SYNC_QUEUE, data)
+  } catch (e) {
+    if (e instanceof TypeError) {
+      await dbClear(STORES.USER_SYNC_QUEUE)
+      await dbAdd(STORES.USER_SYNC_QUEUE, data)
+    } else {
+      user.value = { ...user.value, ...originalUser }
+      throw e
+    }
   }
 }
 
