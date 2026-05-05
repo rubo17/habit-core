@@ -17,7 +17,7 @@ defineProps<{ categories: CategoryStat[] }>()
         :key="cat.id"
         class="flex items-center gap-3"
       >
-        <span class="text-sm text-foreground w-28 truncate flex-shrink-0">{{ cat.name }}</span>
+        <span class="text-sm text-foreground w-17 truncate flex-shrink-0">{{ cat.name }}</span>
         <div class="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
           <div
             class="h-full bg-accent rounded-full transition-all duration-500"
