@@ -9,6 +9,12 @@ class CreateHabitAction
 {
     public function execute(User $user, array $data): Habit
     {
-        return Habit::create(array_merge($data, ['user_id' => $user->id]));
+        $habit = Habit::create(array_merge($data, ['user_id' => $user->id]));
+
+        $todayDayOfWeek = (int) today()->format('w');
+        $habit->scheduled_for_today = $habit->target_days === null
+            || in_array($todayDayOfWeek, $habit->target_days);
+
+        return $habit;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Habit\CreateHabitAction;
 use App\Actions\Habit\DeleteHabitAction;
 use App\Actions\Habit\GetHabitLogsAction;
+use App\Actions\Habit\GetHabitsAction;
 use App\Actions\Habit\LogHabitAction;
 use App\Actions\Habit\UnlogHabitAction;
 use App\Actions\Habit\UpdateHabitAction;
@@ -16,20 +17,13 @@ use Illuminate\Http\Request;
 
 class HabitController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, GetHabitsAction $action): JsonResponse
     {
-        $today = today()->toDateString();
-
-        $habits = $request->user()
-            ->habits()
-            ->with(['category', 'logs' => fn ($q) => $q->whereDate('logged_date', $today)])
-            ->when($request->category_id, fn ($q) => $q->where('category_id', $request->category_id))
-            ->paginate($request->integer('per_page', 15));
-
-        $habits->through(function ($habit) {
-            $habit->today_logged = $habit->logs->isNotEmpty();
-            return $habit;
-        });
+        $habits = $action->execute(
+            $request->user(),
+            $request->integer('category_id') ?: null,
+            $request->integer('per_page', 15),
+        );
 
         return response()->json(['data' => $habits]);
     }
