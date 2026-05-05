@@ -15,7 +15,6 @@ class Habit extends Model
         'user_id',
         'category_id',
         'name',
-        'frequency',
         'reminder_times',
         'target_days',
         'color',

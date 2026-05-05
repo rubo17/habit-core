@@ -27,7 +27,6 @@ onMounted(fetchCategories)
 
 const DEFAULT: CreateHabitDto = {
   name: '',
-  frequency: 'daily',
   category_id: null,
   reminder_times: null,
   target_days: null,

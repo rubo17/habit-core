@@ -70,7 +70,6 @@ class StatsSeeder extends Seeder
                 'user_id'     => $userId,
                 'category_id' => $habit['category_id'],
                 'name'        => $habit['name'],
-                'frequency'   => 'daily',
                 'color'       => $habit['color'],
                 'icon'        => $habit['icon'],
                 'target_days' => $habit['target_days'],
