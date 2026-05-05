@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --z-index-60: 60;
+  --z-index-70: 70;
   /* Surfaces */
   --color-background: #f8fafc;
   --color-surface: #ffffff;

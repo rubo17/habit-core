@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/auth.service'
-import { clearCache } from '@/shared/composables/useLocalStorage'
+import { clearCache, setCache } from '@/shared/composables/useLocalStorage'
 import { dbClear, STORES } from '@/shared/utils/db'
 import type { LoginCredentials, RegisterCredentials } from '../types/auth.types'
 
@@ -20,6 +20,7 @@ export function useAuth() {
       const response = await authService.login(credentials)
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
+      setCache('user', response.data.user)
       router.push({ name: 'habits' })
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Error al iniciar sesión'
@@ -36,6 +37,7 @@ export function useAuth() {
       const response = await authService.register(credentials)
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
+      setCache('user', response.data.user)
       router.push({ name: 'habits' })
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Error al registrarse'

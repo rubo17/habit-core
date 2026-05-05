@@ -43,7 +43,10 @@ export function useSwipe(onComplete: () => void) {
     if (offsetX.value < -SWIPE_THRESHOLD) {
       const width = elementRef.value?.offsetWidth ?? 400
       offsetX.value = -width
-      setTimeout(onComplete, 220)
+      setTimeout(() => {
+      onComplete()
+      offsetX.value = 0
+    }, 220)
     } else {
       offsetX.value = 0
     }

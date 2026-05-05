@@ -49,11 +49,12 @@ export async function dbGetAll<T>(store: StoreName): Promise<T[]> {
 
 export async function dbPutAll<T>(store: StoreName, items: T[]): Promise<void> {
   const db = await openDB()
+  const raw = JSON.parse(JSON.stringify(items)) as T[]
   return new Promise((resolve, reject) => {
     const tx = db.transaction(store, 'readwrite')
     const s = tx.objectStore(store)
     s.clear()
-    for (const item of items) s.put(item)
+    for (const item of raw) s.put(item)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
@@ -61,9 +62,10 @@ export async function dbPutAll<T>(store: StoreName, items: T[]): Promise<void> {
 
 export async function dbPut<T>(store: StoreName, item: T): Promise<void> {
   const db = await openDB()
+  const raw = JSON.parse(JSON.stringify(item)) as T
   return new Promise((resolve, reject) => {
     const tx = db.transaction(store, 'readwrite')
-    tx.objectStore(store).put(item)
+    tx.objectStore(store).put(raw)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
@@ -91,9 +93,10 @@ export async function dbGet<T>(store: StoreName, key: IDBValidKey): Promise<T | 
 
 export async function dbAdd<T>(store: StoreName, item: T): Promise<void> {
   const db = await openDB()
+  const raw = JSON.parse(JSON.stringify(item)) as T
   return new Promise((resolve, reject) => {
     const tx = db.transaction(store, 'readwrite')
-    tx.objectStore(store).add(item)
+    tx.objectStore(store).add(raw)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })

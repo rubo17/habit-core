@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import BaseModal from '@/shared/components/BaseModal.vue'
+import BaseButton from '@/shared/components/BaseButton.vue'
 import BaseSelect from '@/shared/components/BaseSelect.vue'
 import HabitIcon from '@/shared/components/icons/HabitIcon.vue'
 import HabitIconPicker from './HabitIconPicker.vue'
+import HabitScheduleModal from './HabitScheduleModal.vue'
 import CreateCategoryModal from './CreateCategoryModal.vue'
 import { useHabits } from '../composables/useHabits'
 import { useCategories } from '../composables/useCategories'
@@ -11,7 +13,7 @@ import { useModal } from '@/shared/composables/useModal'
 import type { CreateHabitDto, HabitCategory } from '../types/habit.types'
 import DefaultCategoryIcon from './icons/DefaultCategoryIcon.vue'
 import { HABIT_COLORS } from '@/constants/habitColors'
-import { HABIT_DAYS, ALL_DAYS } from '@/constants/habitDays'
+import { HABIT_DAY_NAMES } from '@/constants/habitDays'
 
 defineProps<{ isOpen: boolean }>()
 const emit = defineEmits<{ close: [] }>()
@@ -19,6 +21,7 @@ const emit = defineEmits<{ close: [] }>()
 const { createHabit } = useHabits()
 const { categories, fetchCategories } = useCategories()
 const categoryModal = useModal()
+const scheduleModal = useModal()
 
 onMounted(fetchCategories)
 
@@ -26,29 +29,36 @@ const DEFAULT: CreateHabitDto = {
   name: '',
   frequency: 'daily',
   category_id: null,
-  reminder_time: null,
-  reminder_days: null,
+  reminder_times: null,
+  target_days: null,
   color: '#6366f1',
   icon: 'sparkles',
 }
 
 const form = reactive<CreateHabitDto>({ ...DEFAULT })
 const showIconPicker = ref(false)
-const selectedDays = ref<number[]>([...ALL_DAYS])
 
-watch(() => form.reminder_time, (val) => {
-  if (!val) {
-    selectedDays.value = [...ALL_DAYS]
-    form.reminder_days = null
-  }
+const scheduleSummary = computed(() => {
+  const preset = !form.target_days || form.target_days.length === 0
+    ? 'Diario'
+    : form.target_days.length === 5 ? 'Entre semana'
+    : form.target_days.length === 2 ? 'Fin de semana'
+    : 'Personalizado'
+
+  if (!form.reminder_times || Object.keys(form.reminder_times).length === 0) return preset
+
+  const days = Object.keys(form.reminder_times)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map(d => HABIT_DAY_NAMES[d]!.slice(0, 3))
+    .join(', ')
+  return `${preset} · 🔔 ${days}`
 })
 
-function toggleDay(day: number) {
-  if (selectedDays.value.includes(day)) {
-    selectedDays.value = selectedDays.value.filter(d => d !== day)
-  } else {
-    selectedDays.value = [...selectedDays.value, day]
-  }
+function onScheduleSave({ targetDays, reminderTimes }: { targetDays: number[] | null; reminderTimes: Record<string, string> | null }) {
+  form.target_days = targetDays
+  form.reminder_times = reminderTimes
+  scheduleModal.close()
 }
 
 function onCategoryCreated(category: HabitCategory) {
@@ -58,7 +68,6 @@ function onCategoryCreated(category: HabitCategory) {
 function resetForm() {
   Object.assign(form, DEFAULT)
   showIconPicker.value = false
-  selectedDays.value = [...ALL_DAYS]
 }
 
 function close() {
@@ -66,15 +75,17 @@ function close() {
   emit('close')
 }
 
+import { toRaw } from 'vue'
+import { ALL_DAYS } from '@/constants/habitDays'
+import SchedulePicker from './SchedulePicker.vue'
+
 async function submit() {
   if (!form.name.trim()) return
 
-  const days = selectedDays.value
-  const reminderDays = form.reminder_time && days.length < 7 && days.length > 0
-    ? days
-    : null
+  const payload = structuredClone(toRaw(form))
+  payload.target_days = payload.target_days ?? ALL_DAYS
 
-  await createHabit({ ...form, reminder_days: reminderDays })
+  await createHabit(payload)
   close()
 }
 </script>
@@ -89,10 +100,10 @@ async function submit() {
           @click="showIconPicker = !showIconPicker"
           :style="{ backgroundColor: form.color ?? '#6366f1' }"
           class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white transition-transform duration-150 active:scale-95"
-        > 
+        >
           <HabitIcon v-if="form.icon" :name="form.icon" :size="22" />
           <DefaultCategoryIcon v-else :size="22" />
-      </button>
+        </button>
 
         <input
           v-model="form.name"
@@ -147,43 +158,14 @@ async function submit() {
         </div>
       </div>
 
-      <div class="flex flex-col gap-3">
-        <p class="text-xs font-medium text-muted-foreground">Recordatorio <span class="font-normal">(opcional)</span></p>
-        <input
-          v-model="form.reminder_time"
-          type="time"
-          class="w-full bg-surface-raised border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow duration-150"
-        />
+      <SchedulePicker
+        :scheduleSummary="scheduleSummary"
+        @click="scheduleModal.open()"
+      />
 
-        <div v-if="form.reminder_time" class="flex flex-col gap-2">
-          <p class="text-xs text-muted-foreground">Días</p>
-          <div class="flex gap-2">
-            <button
-              v-for="day in HABIT_DAYS"
-              :key="day.value"
-              type="button"
-              @click="toggleDay(day.value)"
-              :class="[
-                'w-9 h-9 rounded-full text-xs font-medium transition-colors duration-150',
-                selectedDays.includes(day.value)
-                  ? 'bg-accent text-accent-foreground'
-                  : 'bg-surface-raised text-muted-foreground',
-              ]"
-            >
-              {{ day.label }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        @click="submit"
-        :disabled="!form.name.trim()"
-        class="w-full py-3 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground font-medium transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+      <BaseButton :disabled="!form.name.trim()" @click="submit">
         Crear hábito
-      </button>
+      </BaseButton>
 
     </div>
   </BaseModal>
@@ -192,5 +174,13 @@ async function submit() {
     :is-open="categoryModal.isOpen.value"
     @close="categoryModal.close()"
     @created="onCategoryCreated"
+  />
+
+  <HabitScheduleModal
+    :open="scheduleModal.isOpen.value"
+    :target-days="form.target_days ?? null"
+    :reminder-times="form.reminder_times ?? null"
+    @close="scheduleModal.close()"
+    @save="onScheduleSave"
   />
 </template>
