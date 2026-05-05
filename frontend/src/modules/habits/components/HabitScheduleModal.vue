@@ -80,7 +80,7 @@ function save() {
 
   const reminderTimes: Record<string, string> = {}
   for (const day of visibleDays.value) {
-    if (times.value[String(day)]) reminderTimes[String(day)] = times.value[String(day)]
+    if (times.value[String(day)]) reminderTimes[String(day)] = times.value[String(day)] ?? ''
   }
 
   emit('save', {
@@ -94,7 +94,6 @@ function save() {
   <BaseModal title="Horarios y notificaciones" :open="open" size="xl" :level="2" @close="emit('close')">
     <div class="flex flex-col gap-4 pt-1">
 
-      <!-- Presets -->
       <div class="flex gap-2 flex-wrap">
         <button
           v-for="preset in PRESETS"
@@ -112,7 +111,6 @@ function save() {
         </button>
       </div>
 
-      <!-- Custom day toggles -->
       <div v-if="activePreset === 'custom'" class="flex gap-2">
         <button
           v-for="day in HABIT_DAYS"
@@ -130,7 +128,6 @@ function save() {
         </button>
       </div>
 
-      <!-- Day cards: days + notification time -->
       <div v-if="sortedVisibleDays.length" class="flex flex-col gap-2">
         <p class="text-xs text-muted-foreground">Notificación <span class="font-normal">(opcional)</span></p>
         <div

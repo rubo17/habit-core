@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-          <button
+    <button
         type="button"
         class="flex items-center justify-between w-full bg-surface-raised rounded-xl px-4 py-3 transition-colors duration-150 hover:bg-border"
       >

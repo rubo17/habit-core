@@ -21,7 +21,6 @@ const { isExpanded, toggleExpand } = useHabitCard()
 <template>
   <div class="rounded-2xl overflow-hidden">
 
-    <!-- Fila principal con swipe -->
     <div class="relative overflow-hidden">
       <div v-show="offsetX < 0" class="absolute inset-0 bg-danger flex items-center justify-end pr-5">
         <DeleteHabitIcon
@@ -33,7 +32,7 @@ const { isExpanded, toggleExpand } = useHabitCard()
       <div
         ref="elementRef"
         :style="{ transform: `translateX(${offsetX}px)` }"
-        :class="['relative flex items-center gap-3 p-4 bg-surface cursor-pointer', { 'transition-transform duration-200': isAnimating }]"
+        :class="['relative flex items-center gap-3 p-4 bg-surface cursor-pointer', { 'transition-transform duration-200': isAnimating, 'opacity-50': !habit.scheduled_for_today }]"
         @click="toggleExpand"
         @touchstart="onTouchStart"
         @touchend="onTouchEnd"
@@ -53,10 +52,10 @@ const { isExpanded, toggleExpand } = useHabitCard()
 
         <div class="flex-1 min-w-0">
           <p class="text-foreground font-medium truncate">{{ habit.name }}</p>
-          <p v-if="habit.category || habit.reminder_times" class="text-muted-foreground text-sm flex items-center gap-1">
+          <p v-if="habit.category || !habit.scheduled_for_today" class="text-muted-foreground text-xs flex items-center gap-2 mt-0.5">
             <span v-if="habit.category">{{ habit.category.name }}</span>
-            <span v-if="habit.category && habit.reminder_times">·</span>
-            <span v-if="habit.reminder_times">🔔 {{ Object.keys(habit.reminder_times).length }}d</span>
+            <span v-if="habit.category && !habit.scheduled_for_today">·</span>
+            <span class="py-2 px-3 rounded-full bg-danger/70 text-accent-foreground" v-if="!habit.scheduled_for_today">No programado hoy</span>
           </p>
         </div>
 
@@ -81,7 +80,6 @@ const { isExpanded, toggleExpand } = useHabitCard()
       </div>
     </div>
 
-    <!-- Sección expandible -->
     <ExpandedCard :is-expanded="isExpanded" :habit="habit" @edit="emit('edit')" />
 
   </div>
