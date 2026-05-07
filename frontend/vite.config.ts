@@ -16,7 +16,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['icon-192x192.png', 'icon-512x512.png'],
       manifest: {
         name: 'Habit Core',
         short_name: 'HabitCore',
@@ -35,7 +35,7 @@ export default defineConfig({
       },
       devOptions: {
         enabled: true,
-        type: 'classic',
+        type: 'module',
       },
     }),
   ],
