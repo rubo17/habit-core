@@ -23,6 +23,7 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+.env
 
 *.tsbuildinfo
 
@@ -37,4 +38,5 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+dev-dist
 claude.md

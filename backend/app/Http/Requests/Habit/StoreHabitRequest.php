@@ -11,7 +11,6 @@ class StoreHabitRequest extends FormRequest
         return [
             'category_id'   => 'nullable|exists:categories,id',
             'name'          => 'required|string|max:255',
-            'frequency'     => 'required|in:daily',
             'reminder_times'   => 'nullable|array',
             'reminder_times.*' => 'string|date_format:H:i',
             'target_days'   => 'nullable|array',

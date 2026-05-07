@@ -29,7 +29,10 @@
     "vite": "^8.0.3",
     "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-vue-devtools": "^8.1.1",
-    "vue-tsc": "^3.2.6"
+    "vue-tsc": "^3.2.6",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-strategies": "^7.4.1"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

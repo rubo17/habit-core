@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HabitController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -32,5 +33,8 @@ Route::prefix('v1')->group(function () {
         Route::post('categories', [CategoryController::class, 'store']);
         Route::put('categories/{category}', [CategoryController::class, 'update']);
         Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
+
+        Route::post('push-subscriptions', [PushSubscriptionController::class, 'store']);
+        Route::delete('push-subscriptions', [PushSubscriptionController::class, 'destroy']);
     });
 });

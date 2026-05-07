@@ -10,7 +10,6 @@ export interface Habit {
   category_id: number | null
   category?: HabitCategory | null
   name: string
-  frequency: 'daily'
   reminder_times: Record<string, string> | null
   scheduled_for_today:boolean
   target_days: number[] | null
@@ -25,7 +24,6 @@ export interface Habit {
 export interface CreateHabitDto {
   category_id: number | null
   name: string
-  frequency: 'daily'
   reminder_times?: Record<string, string> | null
   target_days?: number[] | null
   color?: string | null
