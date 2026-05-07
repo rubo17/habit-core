@@ -15,15 +15,19 @@ export function useSwipe(onComplete: () => void) {
   let isHorizontal: boolean | null = null
 
   function onTouchStart(e: TouchEvent) {
-    startX = e.touches[0].clientX
-    startY = e.touches[0].clientY
+    const touch = e.touches[0]
+    if (!touch) return
+    startX = touch.clientX
+    startY = touch.clientY
     isHorizontal = null
     isAnimating.value = false
   }
 
   function onTouchMove(e: TouchEvent) {
-    const deltaX = e.touches[0].clientX - startX
-    const deltaY = e.touches[0].clientY - startY
+    const touch = e.touches[0]
+    if (!touch) return
+    const deltaX = touch.clientX - startX
+    const deltaY = touch.clientY - startY
 
     if (isHorizontal === null) {
       isHorizontal = Math.abs(deltaX) > Math.abs(deltaY)
