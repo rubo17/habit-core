@@ -55,6 +55,10 @@ async function deleteCategory(id: number): Promise<void> {
   }
 }
 
+export function resetCategoriesState() {
+  categories.value = []
+}
+
 export function useCategories() {
   return { categories, fetchCategories, createCategory, deleteCategory }
 }
