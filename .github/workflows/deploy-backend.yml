@@ -1,0 +1,51 @@
+name: Deploy Backend to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install PHP dependencies
+        working-directory: backend
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: backend/
+          server-dir: /public_html/api/
+          exclude: |
+            **/.git*
+            **/.env*
+            **/node_modules/**
+            **/tests/**
+            **/storage/logs/**
+
+      - name: Run post-deploy commands
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/u402662284/domains/habitcore.es/public_html/api
+            /opt/alt/php84/usr/bin/php artisan optimize:clear
+            /opt/alt/php84/usr/bin/php artisan migrate --force
+            /opt/alt/php84/usr/bin/php artisan config:cache
+            /opt/alt/php84/usr/bin/php artisan route:cache
+            /opt/alt/php84/usr/bin/php artisan view:cache
+            echo "Deploy completed at $(date)"
