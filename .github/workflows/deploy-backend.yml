@@ -1,4 +1,4 @@
-# This workflow deploys the backend to production when changes are pushed to the main branch.
+# This workflow deploys the backend to production when changes are pushed to the main branch
 name: Deploy Backend to Production
 
 on:
