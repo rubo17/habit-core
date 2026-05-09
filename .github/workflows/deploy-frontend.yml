@@ -1,4 +1,4 @@
-name: Deploy frontend to Hostinger
+name: Deploy frontend to Hostingerr
 
 on:
   push:
