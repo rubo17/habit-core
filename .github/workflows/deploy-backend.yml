@@ -1,4 +1,3 @@
-# This workflow deploys the backend to production when changes are pushed to the main branch
 name: Deploy Backend to Production
 
 on:
@@ -14,15 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup PHP 8.4
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-
-      - name: Install PHP dependencies
-        working-directory: backend
-        run: composer install --no-dev --optimize-autoloader
-
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -37,6 +27,7 @@ jobs:
             **/.git*
             **/.env*
             **/node_modules/**
+            **/vendor/**
             **/tests/**
             **/storage/logs/**
 
@@ -49,6 +40,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/u402662284/domains/habitcore.es/public_html/api
+            /opt/alt/php84/usr/bin/composer install --no-dev --optimize-autoloader
             /opt/alt/php84/usr/bin/php artisan optimize:clear
             /opt/alt/php84/usr/bin/php artisan migrate --force
             /opt/alt/php84/usr/bin/php artisan config:cache
