@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies & Build
         working-directory: frontend
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
