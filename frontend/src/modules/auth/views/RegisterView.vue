@@ -9,7 +9,7 @@
     <!-- Form -->
     <form @submit.prevent="handleRegister" class="w-full flex flex-col gap-4">
       <AuthInput
-        label="Name"
+        label="Nombre"
         placeholder="Jane Doe"
         type="text"
         v-model="form.name"
@@ -21,13 +21,13 @@
         v-model="form.email"
       />
       <AuthInput
-        label="Password"
+        label="Contraseña"
         placeholder="••••••••"
         type="password"
         v-model="form.password"
       />
       <AuthInput
-        label="Confirm password"
+        label="Confirma la contraseña"
         placeholder="••••••••"
         type="password"
         v-model="form.confirmPassword"
@@ -35,8 +35,7 @@
 
       <AuthSubmitButton :title="'REGISTRARSE'" :loading="loading" />
 
-
-      <p v-if="error" class="text-sm text-danger text-center">{{ error }}</p>
+      <p v-if="validationError || error" class="text-sm text-danger text-center">{{ validationError || error }}</p>
     </form>
 
     <!-- Google -->
@@ -51,7 +50,7 @@
 
     <!-- Login link -->
     <p class="text-sm text-muted-foreground">
-      Already have an account?
+      ¿Ya tienes una cuenta?
       <RouterLink :to="{ name: 'login' }" class="text-accent font-medium hover:underline">Inicia sesión!</RouterLink>
     </p>
 
@@ -59,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import AuthInput from '../components/AuthInput.vue'
 import GoogleButton from '../components/GoogleButton.vue'
@@ -76,7 +75,14 @@ const form = reactive({
   confirmPassword: ''
 })
 
+const validationError = ref<string | null>(null)
+
 function handleRegister() {
+  validationError.value = null
+  if (form.password !== form.confirmPassword) {
+    validationError.value = 'Las contraseñas no coinciden'
+    return
+  }
   register({
     name: form.name,
     email: form.email,

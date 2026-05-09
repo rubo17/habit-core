@@ -5,9 +5,13 @@ import type { AuthUser } from '@/modules/auth/types/auth.types'
 
 type UserUpdatePayload = Pick<AuthUser, 'name' | 'email'>
 
-const DEFAULT_USER: AuthUser = { id: 0, name: '', email: '' }
+export const DEFAULT_USER: AuthUser = { id: 0, name: '', email: '' }
 
 const user = useLocalStorage<AuthUser>('user', DEFAULT_USER)
+
+export function resetUser() {
+  user.value = { ...DEFAULT_USER }
+}
 
 async function update(data: UserUpdatePayload) {
   const originalUser = { ...user.value }

@@ -166,6 +166,11 @@ async function flushQueue() {
 
 window.addEventListener('online', flushQueue)
 
+export function resetHabitsState() {
+  habits.value = []
+  syncQueue.value = []
+}
+
 export function useHabits() {
   return { habits, completed, fetchHabits, toggleHabit, createHabit, updateHabit, deleteHabit }
 }
