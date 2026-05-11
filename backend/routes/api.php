@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\PushSubscriptionController;
@@ -12,6 +13,8 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
         Route::post('register', [AuthController::class, 'register']);
+        Route::post('forgot-password', [PasswordResetController::class, 'forgot']);
+        Route::post('reset-password', [PasswordResetController::class, 'reset']);
     });
 
     Route::middleware('auth:sanctum')->group(function () {

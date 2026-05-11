@@ -9,17 +9,18 @@ use Illuminate\Support\Facades\DB;
 
 class StatsSeeder extends Seeder
 {
+    public int $userId;
+
     public function run(): void
     {
-        $userId = 3;
 
         DB::table('categories')->insert([
-            ['user_id' => $userId, 'name' => 'Salud', 'icon' => 'heart', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $userId, 'name' => 'Mente', 'icon' => 'brain', 'created_at' => now(), 'updated_at' => now()],
+            ['user_id' => $this->userId, 'name' => 'Salud', 'icon' => 'heart', 'created_at' => now(), 'updated_at' => now()],
+            ['user_id' => $this->userId, 'name' => 'Mente', 'icon' => 'brain', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        $healthCategoryId = DB::table('categories')->where('user_id', $userId)->where('name', 'Salud')->value('id');
-        $mindCategoryId   = DB::table('categories')->where('user_id', $userId)->where('name', 'Mente')->value('id');
+        $healthCategoryId = DB::table('categories')->where('user_id', $this->userId)->where('name', 'Salud')->value('id');
+        $mindCategoryId   = DB::table('categories')->where('user_id', $this->userId)->where('name', 'Mente')->value('id');
 
         $habits = [
             [
@@ -67,7 +68,7 @@ class StatsSeeder extends Seeder
         $habitIds = [];
         foreach ($habits as $habit) {
             $id = DB::table('habits')->insertGetId([
-                'user_id'     => $userId,
+                'user_id'     => $this->userId,
                 'category_id' => $habit['category_id'],
                 'name'        => $habit['name'],
                 'color'       => $habit['color'],

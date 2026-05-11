@@ -1,5 +1,5 @@
 import { http } from '@/shared/utils/http'
-import type { AuthResponse, AuthUser, LoginCredentials, RegisterCredentials } from '../types/auth.types'
+import type { AuthResponse, AuthUser, ForgotPasswordCredentials, LoginCredentials, RegisterCredentials, ResetPasswordCredentials } from '../types/auth.types'
 
 export const authService = {
   login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -12,5 +12,13 @@ export const authService = {
 
   getCurrentUser(): Promise<{ data: AuthUser }> {
     return http.get<{ data: AuthUser }>('/user')
+  },
+
+  forgotPassword(credentials: ForgotPasswordCredentials): Promise<{ message: string }> {
+    return http.post<{ message: string }>('/auth/forgot-password', credentials)
+  },
+
+  resetPassword(credentials: ResetPasswordCredentials): Promise<{ message: string }> {
+    return http.post<{ message: string }>('/auth/reset-password', credentials)
   },
 }

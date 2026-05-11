@@ -22,3 +22,14 @@ export interface AuthResponse {
     token: string
   }
 }
+
+export interface ForgotPasswordCredentials {
+  email: string
+}
+
+export interface ResetPasswordCredentials {
+  token: string
+  email: string
+  password: string
+  password_confirmation: string
+}

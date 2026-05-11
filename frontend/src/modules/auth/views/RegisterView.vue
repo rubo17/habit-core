@@ -24,12 +24,14 @@
         label="Contraseña"
         placeholder="••••••••"
         type="password"
+        autocomplete="new-password"
         v-model="form.password"
       />
       <AuthInput
         label="Confirma la contraseña"
         placeholder="••••••••"
         type="password"
+        autocomplete="new-password"
         v-model="form.confirmPassword"
       />
 
