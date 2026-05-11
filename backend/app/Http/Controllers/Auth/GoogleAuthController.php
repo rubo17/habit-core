@@ -18,7 +18,7 @@ class GoogleAuthController extends Controller
     {
         $googleUser = Socialite::driver('google')->user();
         $result     = $action->execute($googleUser);
-        $frontend   = env('FRONTEND_URL', 'http://localhost:5173');
+        $frontend   = config('app.frontend_url');
 
         return redirect("{$frontend}/auth/callback?token={$result['token']}");
     }

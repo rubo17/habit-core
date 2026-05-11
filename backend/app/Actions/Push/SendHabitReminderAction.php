@@ -26,7 +26,7 @@ class SendHabitReminderAction
 
         $payload = json_encode([
             'title' => 'Habit Core',
-            'body'  => "Hora de registrar: {$habit->name}",
+            'body'  => "Completa tu hábito ({$habit->name})",
             'icon'  => '/icon-192x192.png',
             'badge' => '/icon-192x192.png',
             'tag'   => "habit-{$habit->id}",
