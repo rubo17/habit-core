@@ -17,6 +17,7 @@
         label="Password"
         placeholder="••••••••"
         type="password"
+        autocomplete="current-password"
         v-model="form.password"
       />
 
@@ -25,7 +26,9 @@
       <p v-if="error" class="text-sm text-danger text-center">{{ error }}</p>
 
       <div class="text-center">
-        <a href="#" class="text-sm text-accent hover:underline">Olvidaste la contraseña?</a>
+        <RouterLink :to="{ name: 'forgot-password' }" class="text-sm text-accent hover:underline">
+          Olvidaste la contraseña?
+        </RouterLink>
       </div>
     </form>
 

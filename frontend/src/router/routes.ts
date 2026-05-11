@@ -43,6 +43,16 @@ export const routes = [
         path: 'callback',
         name: 'auth-callback',
         component: () => import('@/modules/auth/views/AuthCallbackView.vue')
+      },
+      {
+        path: 'forgot-password',
+        name: 'forgot-password',
+        component: () => import('@/modules/auth/views/ForgotPasswordView.vue')
+      },
+      {
+        path: 'reset-password',
+        name: 'reset-password',
+        component: () => import('@/modules/auth/views/ResetPasswordView.vue')
       }
     ]
   },

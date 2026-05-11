@@ -7,6 +7,7 @@
           :type="inputType"
           :placeholder="placeholder"
           :value="modelValue"
+          :autocomplete="autocomplete"
           @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
           class="bg-transparent text-foreground text-sm outline-none w-full placeholder:text-muted-foreground"
         />
@@ -38,6 +39,7 @@ const props = defineProps<{
   placeholder?: string
   type?: string
   modelValue: string
+  autocomplete?: string
 }>()
 
 defineEmits<{
