@@ -21,7 +21,6 @@ jobs:
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
-
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -32,3 +31,4 @@ jobs:
           protocol: ftp
           local-dir: frontend/dist/
           server-dir: /public_html/
+          timeout: 600000
