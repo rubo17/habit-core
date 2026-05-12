@@ -24,9 +24,9 @@ class StatsSeeder extends Seeder
 
         $habits = [
             [
-                'name'        => 'Ejercicio',
+                'name'        => 'Hacer ejercicio',
                 'color'       => '#10b981',
-                'icon'        => 'running',
+                'icon'        => 'flame',
                 'category_id' => $healthCategoryId,
                 'target_days' => json_encode([1, 3, 5]),
                 'rate'        => 0.85,
@@ -34,7 +34,7 @@ class StatsSeeder extends Seeder
             [
                 'name'        => 'Meditación',
                 'color'       => '#8b5cf6',
-                'icon'        => 'sparkles',
+                'icon'        => 'headphones',
                 'category_id' => $mindCategoryId,
                 'target_days' => null,
                 'rate'        => 0.65,
@@ -42,24 +42,24 @@ class StatsSeeder extends Seeder
             [
                 'name'        => 'Lectura',
                 'color'       => '#f59e0b',
-                'icon'        => 'book',
+                'icon'        => 'book-open',
                 'category_id' => $mindCategoryId,
                 'target_days' => null,
                 'rate'        => 0.50,
             ],
             [
-                'name'        => 'Agua',
+                'name'        => 'Programar',
                 'color'       => '#3b82f6',
-                'icon'        => 'drop',
-                'category_id' => $healthCategoryId,
+                'icon'        => 'target',
+                'category_id' => $mindCategoryId,
                 'target_days' => null,
                 'rate'        => 0.90,
             ],
             [
-                'name'        => 'Sin azúcar',
+                'name'        => 'Estudiar',
                 'color'       => '#ef4444',
-                'icon'        => 'fire',
-                'category_id' => $healthCategoryId,
+                'icon'        => 'brain',
+                'category_id' => $mindCategoryId,
                 'target_days' => json_encode([1, 2, 3, 4, 5]),
                 'rate'        => 0.40,
             ],
