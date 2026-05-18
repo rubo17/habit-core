@@ -98,48 +98,37 @@ function cellColor(level: number): string {
 
 <template>
   <div class="w-full overflow-x-auto scrollbar-hidden">
-    <div class="flex w-full gap-[3px] min-w-[700px]">
+    <div class="min-w-[700px] grid grid-cols-[auto_repeat(53,1fr)] gap-[3px]">
 
-      <!-- Labels izquierda -->
-      <div class="flex flex-col gap-[3px] mr-1 flex-shrink-0">
-        <div class="h-4" />
-
-        <div
-          v-for="(label, i) in DAY_LABELS"
-          :key="i"
-          class="min-h-[11px] flex items-center justify-end text-[9px] text-muted-foreground leading-none"
+      <!-- Fila cabecera: meses -->
+      <div class="h-4" />
+      <div
+        v-for="(week, wi) in weeks"
+        :key="`m-${wi}`"
+        class="h-4 relative"
+      >
+        <span
+          v-if="monthLabels.find((m) => m.col === wi)"
+          class="absolute text-[9px] text-muted-foreground whitespace-nowrap leading-none"
         >
+          {{ monthLabels.find((m) => m.col === wi)?.label }}
+        </span>
+      </div>
+
+      <!-- Filas de días -->
+      <template v-for="(label, di) in DAY_LABELS" :key="`row-${di}`">
+        <div class="flex items-center justify-end pr-1 text-[9px] text-muted-foreground leading-none">
           {{ label }}
         </div>
-      </div>
-
-      <!-- Grid -->
-      <div class="flex flex-1 gap-[3px]">
         <div
           v-for="(week, wi) in weeks"
-          :key="wi"
-          class="flex flex-col flex-1 min-w-[11px] gap-[3px]"
-        >
-          <!-- Mes -->
-          <div class="h-4 relative">
-            <span
-              v-if="monthLabels.find((m) => m.col === wi)"
-              class="absolute text-[9px] text-muted-foreground whitespace-nowrap leading-none"
-            >
-              {{ monthLabels.find((m) => m.col === wi)?.label }}
-            </span>
-          </div>
+          :key="`${wi}-${di}`"
+          :title="week[di]?.date ?? ''"
+          class="aspect-square rounded-[2px] transition-opacity duration-150 hover:opacity-80"
+          :style="{ backgroundColor: cellColor(week[di]?.level ?? 0) }"
+        />
+      </template>
 
-          <!-- Días -->
-          <div
-            v-for="(cell, di) in week"
-            :key="di"
-            :title="cell.date ?? ''"
-            class="w-full aspect-square rounded-[2px] transition-opacity duration-150 hover:opacity-80"
-            :style="{ backgroundColor: cellColor(cell.level) }"
-          />
-        </div>
-      </div>
     </div>
   </div>
 </template>
